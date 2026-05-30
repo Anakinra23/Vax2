@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VaxAdvisor РФ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --T:#064E3B;--Tm:#059669;--Tl:#D1FAE5;--Tx:#ECFDF5;
+  --A:#78350F;--Am:#D97706;--Al:#FEF3C7;
+  --R:#7F1D1D;--Rm:#DC2626;--Rl:#FEE2E2;
+  --B:#1E3A5F;--Bm:#2563EB;--Bl:#DBEAFE;
+  --g1:#F3F4F6;--g2:#E5E7EB;--g3:#D1D5DB;--g4:#9CA3AF;
+  --g6:#4B5563;--g7:#374151;--g8:#1F2937;--g9:#111827;
+  --fd:'Syne',sans-serif;--fb:'Manrope',sans-serif;
+}
+body{font-family:var(--fb);background:#F0F4F2;color:var(--g9);font-size:14px;line-height:1.6}
+.app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sb{background:var(--T);padding:22px 18px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sb::-webkit-scrollbar{width:3px}.sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+.logo{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.logo-i{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-t{font-family:var(--fd);font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.logo-s{font-size:9px;color:rgba(255,255,255,.4)}
+.pt{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:9px;font-weight:700}
+.pr{padding:7px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.pr:last-child{border-bottom:none}
+.pl{font-size:8.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.25);margin-bottom:2px}
+.pv{font-size:12px;font-weight:600;color:#fff}
+.pv.e{color:rgba(255,255,255,.18);font-weight:400;font-style:italic;font-size:11px}
+.chips{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.chip{font-size:9.5px;font-weight:500;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:1px 6px;animation:ci .15s ease}
+@keyframes ci{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.chip.hl{background:rgba(167,243,208,.15);border-color:rgba(167,243,208,.25);color:#A7F3D0}
+.chip.wn{background:rgba(252,211,77,.12);border-color:rgba(252,211,77,.2);color:#FCD34D}
+.sb-stats{display:flex;gap:5px;margin-top:12px}
+.stat{flex:1;background:rgba(255,255,255,.08);border-radius:6px;padding:6px;text-align:center}
+.stat-n{font-family:var(--fd);font-size:17px;font-weight:700;color:#fff}
+.stat-l{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.28)}
+.sb-f{margin-top:auto;padding-top:12px;font-size:9.5px;color:rgba(255,255,255,.18);line-height:1.5}
+
+/* MAIN */
+.main{padding:22px 26px;max-width:800px}
+.ph{margin-bottom:14px}
+.ph h1{font-family:var(--fd);font-size:21px;font-weight:700;color:var(--g9);line-height:1.2;margin-bottom:2px}
+.ph p{color:var(--g6);font-size:12px}
+
+/* TABS */
+.tbar{display:flex;gap:3px;margin-bottom:14px;background:#fff;padding:3px;border-radius:11px;border:1px solid var(--g2)}
+.tb{flex:1;padding:7px 8px;font-family:var(--fd);font-size:11.5px;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:all .2s;color:var(--g6);background:transparent;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.tb:hover{color:var(--g8);background:var(--g1)}
+.tb.act{background:var(--T);color:#fff;box-shadow:0 2px 8px rgba(6,78,59,.25)}
+.tc{display:none}
+.tc.act{display:block;animation:fu .22s ease}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* FORM SECTIONS */
+.sec{background:#fff;border-radius:11px;border:1.5px solid var(--g2);margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.sec.hv{border-color:#6EE7B7}
+.sh{padding:11px 14px;display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;transition:background .1s}
+.sh:hover{background:var(--g1)}
+.si{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.st{font-family:var(--fd);font-size:12px;font-weight:600;color:var(--g8);flex:1}
+.sbg{font-size:9px;font-weight:700;background:var(--Tl);color:var(--T);border-radius:20px;padding:1px 6px;display:none}
+.sbg.vis{display:inline}
+.cv{font-size:10px;color:var(--g4);transition:transform .2s}
+.sec.col .cv{transform:rotate(-90deg)}
+.sb2{padding:11px 14px}
+.sec.col .sb2{display:none}
+.sub{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--g4);margin:9px 0 4px;display:flex;align-items:center;gap:4px}
+.sub::before{content:'';display:block;width:12px;height:1px;background:var(--g3)}
+.sub:first-child{margin-top:0}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fl{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g6);margin-bottom:3px}
+input[type="number"],select{width:100%;height:34px;border:1.5px solid var(--g2);border-radius:7px;padding:0 9px;font-family:var(--fb);font-size:13px;font-weight:500;color:var(--g9);background:#fff;appearance:none;transition:border-color .15s,box-shadow .15s;outline:none}
+input:focus,select:focus{border-color:var(--Tm);box-shadow:0 0 0 3px rgba(5,150,105,.1)}
+.sw{position:relative}
+.sw::after{content:'▾';position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--g4);pointer-events:none;font-size:10px}
+.ci{display:flex;align-items:flex-start;gap:7px;padding:5px 6px;border-radius:6px;cursor:pointer;transition:background .1s}
+.ci:hover{background:var(--g1)}
+.ci input[type="checkbox"]{display:none}
+.cb{width:14px;height:14px;border-radius:4px;flex-shrink:0;border:1.5px solid var(--g3);display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .15s;background:#fff}
+.ci input:checked+.cb{background:var(--Tm);border-color:var(--Tm)}
+.ci input:checked+.cb::after{content:'✓';font-size:9px;color:#fff;font-weight:700}
+.ct{font-size:12px;color:var(--g8);line-height:1.4}
+.ci input:checked~.ct{color:var(--T);font-weight:600}
+.cn{font-size:10px;color:var(--g4);display:block;margin-top:1px}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:7px 6px;border-radius:6px;cursor:pointer;transition:background .1s}
+.tog:hover{background:var(--g1)}
+.tog-t{font-size:12px;color:var(--g8);font-weight:500}
+.tr{width:32px;height:18px;border-radius:9px;background:var(--g2);border:1.5px solid var(--g3);position:relative;flex-shrink:0;transition:all .2s;cursor:pointer}
+.tr.on{background:var(--Tm);border-color:var(--Tm)}
+.th{width:12px;height:12px;border-radius:50%;background:#fff;position:absolute;top:1px;left:1px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tr.on .th{left:15px}
+
+/* BUTTONS */
+.btn{width:100%;padding:10px;font-family:var(--fd);font-size:13px;font-weight:700;background:var(--T);color:#fff;border:none;border-radius:9px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{background:#065F46;transform:translateY(-1px);box-shadow:0 4px 12px rgba(6,78,59,.25)}
+.btn:disabled{background:var(--g2);color:var(--g4);cursor:not-allowed;transform:none;box-shadow:none}
+.btn2{padding:7px 14px;font-family:var(--fd);font-size:11px;font-weight:600;background:#fff;color:var(--g7);border:1.5px solid var(--g2);border-radius:7px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.btn2:hover{border-color:var(--g4);background:var(--g1)}
+
+/* RESULTS */
+.rh{background:var(--T);border-radius:11px;padding:14px 17px;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.rh h2{font-family:var(--fd);font-size:15px;font-weight:700;color:#fff}
+.rh p{font-size:10.5px;color:rgba(255,255,255,.5);margin-top:1px}
+.rc{display:flex;gap:6px;flex-wrap:wrap}
+.rb{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.18)}
+.rb.r{background:rgba(167,243,208,.2);color:#A7F3D0}
+.rb.o{background:rgba(252,211,77,.2);color:#FCD34D}
+.rb.c{background:rgba(252,165,165,.2);color:#FCA5A5}
+.gl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g4);margin:12px 0 5px;display:flex;align-items:center;gap:5px}
+.gl::before{content:'';display:block;width:14px;height:1px;background:var(--g3)}
+.tyh{display:flex;align-items:center;gap:5px;margin:14px 0 7px}
+.tyh:first-child{margin-top:0}
+.tyd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tyt{font-family:var(--fd);font-size:12.5px;font-weight:700;color:var(--g8)}
+.tyc{font-size:11px;color:var(--g4)}
+.vc{background:#fff;border-radius:9px;border:1.5px solid var(--g2);padding:10px 12px;margin-bottom:5px;display:flex;gap:9px;transition:transform .15s,box-shadow .15s;animation:ci2 .2s ease both}
+.vc:hover{transform:translateY(-1px);box-shadow:0 3px 9px rgba(0,0,0,.06)}
+@keyframes ci2{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
+.vc.r{border-left:3px solid var(--Tm)}.vc.o{border-left:3px solid var(--Am)}.vc.c{border-left:3px solid var(--Rm)}
+.vi{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.vc.r .vi{background:var(--Tx)}.vc.o .vi{background:var(--Al)}.vc.c .vi{background:var(--Rl)}
+.vcc{flex:1;min-width:0}
+.vt{display:flex;align-items:flex-start;gap:5px;flex-wrap:wrap;margin-bottom:2px}
+.vn{font-weight:600;font-size:12px;color:var(--g9);line-height:1.3}
+.vtg{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 6px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.vtg.r{background:var(--Tl);color:var(--T)}.vtg.o{background:var(--Al);color:var(--A)}.vtg.c{background:var(--Rl);color:var(--R)}
+.vcal{font-size:8.5px;font-weight:700;background:var(--Bl);color:var(--B);padding:1px 6px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.vd{font-size:10.5px;color:var(--g6);line-height:1.5}
+.vno{margin-top:4px;font-size:10.5px;padding:3px 7px;border-radius:5px;background:var(--Al);color:var(--A);line-height:1.4}
+.disc{margin-top:14px;padding:9px 12px;background:var(--g1);border-radius:7px;font-size:10.5px;color:var(--g6);line-height:1.5}
+
+/* CALENDAR */
+.cleg{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.cli{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--g6)}
+.cld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cst{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g4);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--g2)}
+.cac{background:#fff;border-radius:10px;border:1.5px solid var(--g2);margin-bottom:6px;overflow:hidden}
+.cah{display:flex;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--g1)}
+.cab{min-width:62px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:700;flex-shrink:0;text-align:center;line-height:1.2;padding:0 6px}
+.n0{background:#EDE9FE;color:#4C1D95}.n1{background:#DBEAFE;color:#1E3A5F}
+.n2{background:#D1FAE5;color:#064E3B}.n3{background:#FEF3C7;color:#78350F}
+.n4{background:#FFEDD5;color:#7C2D12}.n5{background:var(--g1);color:var(--g8)}
+.cat{font-size:11.5px;color:var(--g6);flex:1}
+.cvx{display:flex;flex-wrap:wrap;gap:4px;padding:8px 12px}
+.cv2{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.vm{background:var(--Tx);color:var(--T);border:1px solid #A7F3D0}
+.vr{background:#EDE9FE;color:#4C1D95;border:1px solid #DDD6FE}
+.va{background:var(--Bl);color:var(--B);border:1px solid #BFDBFE}
+
+/* PATHOLOGY */
+.pc{background:#fff;border-radius:11px;border:1.5px solid var(--g2);margin-bottom:7px;overflow:hidden}
+.ph2{padding:11px 14px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:background .1s;user-select:none}
+.ph2:hover{background:var(--g1)}
+.pic{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ptl{font-family:var(--fd);font-size:12px;font-weight:600;color:var(--g8);flex:1}
+.pcnt{font-size:10.5px;color:var(--g4);white-space:nowrap}
+.pchv{font-size:9px;color:var(--g4);transition:transform .2s;flex-shrink:0}
+.pc.cl .pchv{transform:rotate(-90deg)}
+.pb{padding:12px 14px;border-top:1px solid var(--g1);display:none}
+.pc.op .pb{display:block;animation:fu .2s ease}
+.pvr{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid var(--g1)}
+.pvr:last-of-type{border-bottom:none}
+.pvi{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:var(--Tx)}
+.pvn{font-weight:600;font-size:12px;color:var(--g9);margin-bottom:1px}
+.pvs{font-size:11px;color:var(--g6);line-height:1.5}
+.sch{display:flex;align-items:flex-start;flex-wrap:wrap;gap:2px;margin-top:5px}
+.ss{display:flex;align-items:center;gap:2px}
+.sn{text-align:center}
+.sd{background:var(--Tm);color:#fff;border-radius:20px;font-size:9px;font-weight:700;padding:2px 7px;white-space:nowrap;display:inline-block}
+.sd.sr{background:var(--Bm)}.sd.sc{background:var(--Rm)}
+.sl{font-size:8.5px;color:var(--g4);display:block;margin-top:1px}
+.sln{width:16px;height:2px;background:var(--g3);flex-shrink:0;margin-top:9px}
+.pcon{margin-top:8px;padding:6px 9px;background:var(--Rl);border-radius:6px;font-size:11px;color:var(--R);line-height:1.4}
+.pnot{margin-top:6px;padding:6px 9px;background:var(--Al);border-radius:6px;font-size:11px;color:var(--A);line-height:1.4}
+.es{text-align:center;padding:28px 16px;background:#fff;border-radius:11px;border:1.5px solid var(--g2)}
+
+/* PATHOGEN TAB */
+.ptc{background:#fff;border-radius:11px;border:1.5px solid var(--g2);margin-bottom:8px;overflow:hidden}
+.pth{padding:11px 14px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:background .1s;user-select:none}
+.pth:hover{background:var(--g1)}
+.pthi{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pttl{font-family:var(--fd);font-size:12.5px;font-weight:600;color:var(--g8);flex:1}
+.ptbg{font-size:9.5px;font-weight:600;padding:1px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.ptchv{font-size:10px;color:var(--g4);transition:transform .2s}
+.ptc.cl .ptchv{transform:rotate(-90deg)}
+.ptb{padding:0 14px 12px;display:none}
+.ptc.op .ptb{display:block;animation:fu .2s ease}
+.ptdesc{font-size:11.5px;color:var(--g6);line-height:1.5;margin-bottom:10px;padding:8px 10px;background:var(--g1);border-radius:7px}
+.vxtb{width:100%;border-collapse:collapse;font-size:11.5px}
+.vxtb th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g4);text-align:left;padding:5px 8px;border-bottom:2px solid var(--g2)}
+.vxtb td{padding:7px 8px;border-bottom:1px solid var(--g1);vertical-align:top;line-height:1.4}
+.vxtb tr:last-child td{border-bottom:none}
+.vxtb tr:hover td{background:var(--g1)}
+.vxn{font-weight:600;color:var(--g9)}
+.vxm{color:var(--g6);font-size:10.5px}
+.vtbg{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;white-space:nowrap;margin-bottom:2px}
+.vtbg.live{background:#FEE2E2;color:#7F1D1D}
+.vtbg.inact{background:#D1FAE5;color:#064E3B}
+.vtbg.rec{background:#DBEAFE;color:#1E3A5F}
+.vtbg.combo{background:#EDE9FE;color:#3B1F6A}
+.vtbg.oral{background:#FEF3C7;color:#78350F}
+.vtbg.mono{background:#FFEDD5;color:#7C2D12}
+
+
+/* ACTION BUTTONS */
+.sec-acts{display:flex;gap:5px;margin-left:auto}
+.act-btn{font-size:9.5px;font-weight:600;border:1px solid var(--g3);border-radius:6px;padding:2px 8px;cursor:pointer;background:#fff;color:var(--g6);white-space:nowrap;transition:all .12s;line-height:1.6}
+.act-btn:hover{background:var(--g1);border-color:var(--g4)}
+.act-btn.grn{border-color:#6EE7B7;color:var(--T);background:var(--Tx)}
+.act-btn.grn:hover{background:var(--Tl)}
+.act-btn.red{border-color:#FCA5A5;color:var(--R);background:var(--Rl)}
+.act-btn.red:hover{background:#FEE2E2}
+/* CONTRAINDICATIONS BLOCK */
+.pcontra-block{margin-top:8px;padding:8px 10px;background:#FEF2F2;border-left:3px solid var(--Rm);border-radius:0 6px 6px 0;font-size:11px;color:var(--R);line-height:1.6}
+.pcontra-block strong{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;color:var(--Rm)}
+
+
+/* ── МОБИЛЬНЫЙ ГАМБУРГЕР ── */
+.mob-header{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--T);position:sticky;top:0;z-index:150}
+.mob-logo{font-family:var(--fd);font-size:14px;font-weight:700;color:#fff;flex:1}
+.mob-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.15);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:0}
+.mob-btn span{display:block;width:16px;height:2px;background:#fff;border-radius:2px;transition:all .2s}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:190;backdrop-filter:blur(2px)}
+.sb-overlay.on{display:block}
+
+@media(max-width:720px){
+  /* Layout */
+  .app{grid-template-columns:1fr}
+  .sb{position:fixed;top:0;left:0;height:100vh;width:280px;z-index:200;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+  .sb.mob-open{transform:translateX(0)}
+  .mob-header{display:flex}
+  .main{padding:14px 14px 24px}
+
+  /* Page header */
+  .ph h1{font-size:17px}
+  .ph p{font-size:11px}
+
+  /* Tab bar — горизонтальный скролл */
+  .tbar{gap:2px;padding:3px;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;flex-wrap:nowrap;scrollbar-width:none}
+  .tbar::-webkit-scrollbar{display:none}
+  .tb{scroll-snap-align:start;font-size:10.5px;padding:7px 9px;white-space:nowrap;flex-shrink:0}
+
+  /* Form sections */
+  .sh{padding:10px 12px}
+  .sb2{padding:10px 12px}
+  .sec-acts{gap:3px}
+  .act-btn{font-size:9px;padding:2px 6px}
+
+  /* 2-column → 1-column */
+  .r2{grid-template-columns:1fr}
+
+  /* Vaccine cards */
+  .vc{padding:9px 10px;gap:8px}
+  .vi{width:27px;height:27px;font-size:12px}
+  .vn{font-size:11.5px}
+  .vd{font-size:10px}
+
+  /* Results header */
+  .rh{flex-direction:column;align-items:flex-start;gap:8px;padding:12px 14px}
+  .rh h2{font-size:14px}
+  .rc{flex-wrap:wrap}
+  .rb{font-size:9.5px;padding:2px 7px}
+
+  /* Calendar cards */
+  .cah{flex-wrap:wrap;gap:6px;padding:8px 11px}
+  .cab{min-width:54px;height:30px;font-size:10px}
+  .cvx{gap:3px;padding:7px 10px}
+  .cv2{font-size:10px;padding:2px 7px}
+
+  /* Pathology cards */
+  .ph2{padding:10px 12px}
+  .ptl{font-size:11.5px}
+  .pcnt{font-size:10px}
+  .ptb{padding:10px 12px}
+  .ptdesc{font-size:11px;padding:6px 8px}
+  .pcontra-block{font-size:10.5px;padding:6px 8px}
+
+  /* Pathogen tab */
+  .pth{padding:10px 12px}
+  .pttl{font-size:11.5px}
+  .ptbg{font-size:9px;padding:1px 5px}
+  .ptb{padding:10px 12px}
+  .vxtb{font-size:10.5px}
+  .vxtb th{font-size:8.5px;padding:4px 6px}
+  .vxtb td{padding:5px 6px}
+  .vtbg{font-size:8.5px;padding:1px 5px}
+
+  /* Search input */
+  #pth-q{font-size:12px;height:32px}
+  #pth-cnt{font-size:10px}
+
+  /* Sidebar stats */
+  .sb-stats{display:none}
+
+  /* Checkboxes */
+  .ci{padding:5px 5px}
+  .ct{font-size:11.5px}
+  .cn{font-size:10px}
+}
+
+
+/* ══ ANTIBODY ANALYSIS TAB ══ */
+.ab-intro{font-size:12px;color:var(--g6);margin-bottom:14px;padding:10px 12px;background:var(--g1);border-radius:8px;line-height:1.5}
+.atc{background:#fff;border-radius:11px;border:1.5px solid var(--g2);margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.atc.has-res{border-color:#6EE7B7}
+.ath{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;transition:background .1s}
+.ath:hover{background:var(--g1)}
+.aticon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.at-info{flex:1;min-width:0}
+.atn{font-family:var(--fd);font-size:12.5px;font-weight:600;color:var(--g8);line-height:1.3}
+.atu{font-size:10px;color:var(--g4);margin-top:1px}
+.at-badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;display:none}
+.atb{display:none;padding:12px 14px;border-top:1px solid var(--g1)}
+.atc.open .atb{display:block;animation:fu .2s ease}
+.at-hint{font-size:11.5px;color:var(--g6);line-height:1.5;padding:8px 10px;background:var(--g1);border-radius:7px;margin-bottom:12px}
+.at-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g6);margin-bottom:7px}
+.at-quant{display:flex;gap:8px;align-items:center}
+.at-quant input{flex:1;height:36px;border:1.5px solid var(--g2);border-radius:7px;padding:0 10px;font-family:var(--fb);font-size:14px;font-weight:500;color:var(--g9);outline:none;transition:border-color .15s}
+.at-quant input:focus{border-color:var(--Tm);box-shadow:0 0 0 3px rgba(5,150,105,.1)}
+.at-unit{font-size:12px;color:var(--g6);white-space:nowrap}
+.qbtns{display:flex;gap:6px;flex-wrap:wrap}
+.qb{font-size:12px;font-weight:500;border:1.5px solid var(--g2);border-radius:8px;padding:6px 14px;cursor:pointer;background:#fff;color:var(--g7);transition:all .15s}
+.qb:hover{background:var(--g1);border-color:var(--g4)}
+.qb.q-neg{background:#FEE2E2;border-color:#FCA5A5;color:#7F1D1D;font-weight:600}
+.qb.q-eqv{background:#FEF3C7;border-color:#FCD34D;color:#78350F;font-weight:600}
+.qb.q-pos{background:#D1FAE5;border-color:#6EE7B7;color:#064E3B;font-weight:600}
+.at-go{margin-top:10px;width:100%;padding:9px;font-family:var(--fd);font-size:12.5px;font-weight:700;background:var(--T);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.at-go:hover{background:#065F46;transform:translateY(-1px)}
+.at-res{margin-top:12px;border-radius:9px;overflow:hidden;border:1.5px solid}
+.at-res-hd{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;flex-wrap:wrap;gap:6px}
+.at-res-label{font-family:var(--fd);font-size:13px;font-weight:700}
+.at-res-val{font-size:12px;font-weight:600;opacity:.75}
+.at-res-bd{padding:10px 12px}
+.at-res-desc{font-size:12px;color:var(--g7);line-height:1.5;margin-bottom:8px}
+.at-res-rec{font-size:12px;line-height:1.5;padding:7px 10px;background:rgba(0,0,0,.04);border-radius:6px;margin-bottom:7px}
+.at-res-vax{font-size:11px;color:var(--g6);display:flex;align-items:center;gap:5px}
+.at-ref{margin-top:12px}
+.at-ref-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g4);margin-bottom:6px}
+.at-ref-table{width:100%;border-collapse:collapse;font-size:11px}
+.at-ref-table td{padding:4px 8px;border-bottom:1px solid var(--g1)}
+.at-ref-table tr:last-child td{border-bottom:none}
+
+@media(max-width:720px){
+  .atn{font-size:11.5px}
+  .qb{font-size:11px;padding:5px 10px}
+}
+
+
+/* ══ ANTIBODY ANALYSIS TAB ══ */
+.ab-intro{font-size:12px;color:var(--g6);margin-bottom:14px;padding:10px 12px;background:var(--g1);border-radius:8px;line-height:1.5}
+.atc{background:#fff;border-radius:11px;border:1.5px solid var(--g2);margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.atc.has-res{border-color:#6EE7B7}
+.ath{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;transition:background .1s}
+.ath:hover{background:var(--g1)}
+.aticon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.at-info{flex:1;min-width:0}
+.atn{font-family:var(--fd);font-size:12.5px;font-weight:600;color:var(--g8);line-height:1.3}
+.atu{font-size:10px;color:var(--g4);margin-top:1px}
+.at-badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;display:none}
+.atb{display:none;padding:12px 14px;border-top:1px solid var(--g1)}
+.atc.open .atb{display:block;animation:fu .2s ease}
+.at-hint{font-size:11.5px;color:var(--g6);line-height:1.5;padding:8px 10px;background:var(--g1);border-radius:7px;margin-bottom:12px}
+.at-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g6);margin-bottom:7px}
+.at-quant{display:flex;gap:8px;align-items:center}
+.at-quant input{flex:1;height:36px;border:1.5px solid var(--g2);border-radius:7px;padding:0 10px;font-family:var(--fb);font-size:14px;font-weight:500;color:var(--g9);outline:none;transition:border-color .15s}
+.at-quant input:focus{border-color:var(--Tm);box-shadow:0 0 0 3px rgba(5,150,105,.1)}
+.at-unit{font-size:12px;color:var(--g6);white-space:nowrap}
+.qbtns{display:flex;gap:6px;flex-wrap:wrap}
+.qb{font-size:12px;font-weight:500;border:1.5px solid var(--g2);border-radius:8px;padding:6px 14px;cursor:pointer;background:#fff;color:var(--g7);transition:all .15s}
+.qb:hover{background:var(--g1);border-color:var(--g4)}
+.qb.q-neg{background:#FEE2E2;border-color:#FCA5A5;color:#7F1D1D;font-weight:600}
+.qb.q-eqv{background:#FEF3C7;border-color:#FCD34D;color:#78350F;font-weight:600}
+.qb.q-pos{background:#D1FAE5;border-color:#6EE7B7;color:#064E3B;font-weight:600}
+.at-go{margin-top:10px;width:100%;padding:9px;font-family:var(--fd);font-size:12.5px;font-weight:700;background:var(--T);color:#fff;border:none;border-radius:8px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.at-go:hover{background:#065F46;transform:translateY(-1px)}
+.at-res{margin-top:12px;border-radius:9px;overflow:hidden;border:1.5px solid}
+.at-res-hd{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;flex-wrap:wrap;gap:6px}
+.at-res-label{font-family:var(--fd);font-size:13px;font-weight:700}
+.at-res-val{font-size:12px;font-weight:600;opacity:.75}
+.at-res-bd{padding:10px 12px}
+.at-res-desc{font-size:12px;color:var(--g7);line-height:1.5;margin-bottom:8px}
+.at-res-rec{font-size:12px;line-height:1.5;padding:7px 10px;background:rgba(0,0,0,.04);border-radius:6px;margin-bottom:7px}
+.at-res-vax{font-size:11px;color:var(--g6);display:flex;align-items:center;gap:5px}
+.at-ref{margin-top:12px}
+.at-ref-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g4);margin-bottom:6px}
+.at-ref-table{width:100%;border-collapse:collapse;font-size:11px}
+.at-ref-table td{padding:4px 8px;border-bottom:1px solid var(--g1)}
+.at-ref-table tr:last-child td{border-bottom:none}
+
+@media(max-width:720px){
+  .atn{font-size:11.5px}
+  .qb{font-size:11px;padding:5px 10px}
+}
+
+
+/* ══ TELEGRAM MINI APP THEME ══ */
+:root {
+  --tg-bg:   var(--tg-theme-bg-color, #ffffff);
+  --tg-bg2:  var(--tg-theme-secondary-bg-color, #F0F4F2);
+  --tg-text: var(--tg-theme-text-color, #111827);
+  --tg-hint: var(--tg-theme-hint-color, #9CA3AF);
+  --tg-btn:  var(--tg-theme-button-color, #064E3B);
+  --tg-btnT: var(--tg-theme-button-text-color, #ffffff);
+  --tg-link: var(--tg-theme-link-color, #059669);
+}
+
+/* Структурные цвета → Telegram-переменные */
+body { background: var(--tg-bg2); color: var(--tg-text); }
+
+.sec, .pc, .cac, .atc, .ptc, .vc, .cal-age-card,
+.path-card, .results-header + div .vc { background: var(--tg-bg); }
+
+.tbar { background: var(--tg-bg); border-color: var(--tg-hint, #E5E7EB); }
+.tb   { color: var(--tg-hint); }
+.tb.act { background: var(--tg-btn); color: var(--tg-btnT); }
+
+.sh, .ath, .pth, .ph2 { background: var(--tg-bg); }
+.sh:hover, .ath:hover, .pth:hover, .ph2:hover { background: var(--tg-bg2); }
+
+input[type="number"], select, .at-quant input {
+  background: var(--tg-bg2); color: var(--tg-text);
+  border-color: var(--tg-hint, #E5E7EB);
+}
+
+.btn  { background: var(--tg-btn); color: var(--tg-btnT); }
+.btn2 { background: var(--tg-bg); color: var(--tg-text); border-color: var(--tg-hint); }
+.at-go { background: var(--tg-btn); color: var(--tg-btnT); }
+
+.disc, .ab-intro, .at-hint, .ptdesc { background: var(--tg-bg2); color: var(--tg-hint); }
+
+.fl, .at-lbl, .sub, .subsection-label { color: var(--tg-hint); }
+.ct, .tog-t, .toggle-text { color: var(--tg-text); }
+.cn, .check-note, .vd, .vcard-desc, .pvs { color: var(--tg-hint); }
+
+.atn, .vn, .pvn, .ptl, .pttl, .ptl { color: var(--tg-text); }
+
+/* Sidebar: оставляем брендовый тёмно-зелёный — узнаваемо */
+
+/* Viewport: учитываем MainButton Telegram (56px снизу) */
+.main { padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+
+/* Убираем box-shadow на карточках в тёмной теме */
+.vc:hover, .atc:hover { box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+
+
+/* ══ TELEGRAM VIEWPORT AUTO-FIT ══ */
+:root { --tg-real-h: 100vh; }
+
+/* На мобильном/Telegram — приложение занимает ровно высоту экрана */
+@media (max-width: 720px) {
+  html, body { height: var(--tg-real-h); overflow: hidden; }
+  .app { height: var(--tg-real-h); overflow: hidden; }
+  .sb  { height: var(--tg-real-h); }
+  .mob-header { flex-shrink: 0; }
+  .main {
+    height: calc(var(--tg-real-h) - 48px); /* 48px = mob-header */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+
+/* Ревакцинационный badge */
+.vrevax{font-size:9px;font-weight:700;background:#EDE9FE;color:#4C1D95;
+  border:1px solid #DDD6FE;padding:2px 6px;border-radius:20px;
+  white-space:nowrap;flex-shrink:0;margin-top:1px}
+
+
+/* ══ ПЛАН ВАКЦИНАЦИИ ══ */
+.plan-empty{text-align:center;padding:32px 16px;background:#fff;border-radius:11px;border:1.5px solid var(--g2)}
+.plan-empty-icon{font-size:36px;margin-bottom:10px}
+.date-row{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap}
+.date-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g6);display:block;margin-bottom:4px}
+.date-input{height:36px;border:1.5px solid var(--g2);border-radius:7px;padding:0 10px;font-family:var(--fb);font-size:13px;color:var(--g9);background:#fff;outline:none;transition:border-color .15s}
+.date-input:focus{border-color:var(--Tm);box-shadow:0 0 0 3px rgba(5,150,105,.1)}
+.plan-gen-btn{height:36px;padding:0 16px;font-family:var(--fd);font-size:12.5px;font-weight:700;background:var(--T);color:#fff;border:none;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.plan-gen-btn:hover{background:#065F46}
+.visit-card{background:#fff;border-radius:11px;border:1.5px solid var(--g2);margin-bottom:10px;overflow:hidden}
+.visit-header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--g1)}
+.visit-num{width:32px;height:32px;border-radius:50%;background:var(--T);color:#fff;font-family:var(--fd);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.visit-date{font-family:var(--fd);font-size:13px;font-weight:600;color:var(--g9)}
+.visit-day{font-size:11px;color:var(--g4);margin-top:1px}
+.visit-note-hd{font-size:10.5px;color:var(--g6);margin-left:auto;text-align:right}
+.visit-body{padding:12px 16px}
+.visit-vax-list{display:flex;flex-wrap:wrap;gap:7px}
+.vvx-chip{display:flex;align-items:center;gap:5px;background:var(--g1);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--g8);border:1px solid var(--g2)}
+.vvx-chip.live-chip{background:#FEF3C7;border-color:#FCD34D;color:#78350F}
+.vvx-chip.single-chip{background:var(--Tx);border-color:#A7F3D0;color:var(--T)}
+.vvx-dose{font-size:9.5px;font-weight:700;background:rgba(0,0,0,.08);border-radius:20px;padding:1px 5px;margin-left:2px}
+.visit-compat-note{margin-top:8px;font-size:11px;color:var(--g6);padding:5px 8px;background:var(--g1);border-radius:6px}
+.plan-timeline{position:relative}
+.plan-timeline .visit-card::before{content:'';position:absolute;left:32px;top:0;bottom:0;width:2px;background:var(--g2);z-index:0}
+
+/* ══ СОВМЕСТИМОСТЬ ══ */
+.compat-intro{font-size:12px;color:var(--g6);margin-bottom:14px;padding:10px 12px;background:var(--g1);border-radius:8px;line-height:1.5}
+.compat-pick{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:14px}
+.compat-vs{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--g4);text-align:center;padding-bottom:8px}
+.compat-sel{width:100%;height:36px;border:1.5px solid var(--g2);border-radius:7px;padding:0 9px;font-family:var(--fb);font-size:12.5px;color:var(--g9);background:#fff;outline:none;appearance:none;transition:border-color .15s}
+.compat-sel:focus{border-color:var(--Tm)}
+.compat-result{border-radius:10px;border:1.5px solid;padding:14px 16px;margin-bottom:14px;display:none}
+.compat-result.ok{border-color:#059669;background:#ECFDF5}
+.compat-result.warn{border-color:#D97706;background:#FFFBEB}
+.compat-result.no{border-color:#DC2626;background:#FEF2F2}
+.compat-result-icon{font-size:22px;margin-bottom:6px}
+.compat-result-title{font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:4px}
+.compat-result-text{font-size:12.5px;line-height:1.6}
+.compat-all-btn{width:100%;padding:9px;font-family:var(--fd);font-size:12.5px;font-weight:700;background:var(--g1);color:var(--g7);border:1.5px solid var(--g2);border-radius:8px;cursor:pointer;transition:all .15s}
+.compat-all-btn:hover{border-color:var(--g4);background:#fff}
+.compat-matrix{margin-top:14px;overflow-x:auto}
+.cmat{border-collapse:collapse;font-size:11px;width:100%}
+.cmat th{padding:6px 8px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g4);background:var(--g1);border:1px solid var(--g2);text-align:center}
+.cmat td{padding:6px 8px;border:1px solid var(--g2);text-align:center}
+.cmat td.cv-ok{background:#D1FAE5;color:#065F46;font-weight:600}
+.cmat td.cv-warn{background:#FEF3C7;color:#78350F;font-weight:600}
+.cmat td.cv-no{background:#FEE2E2;color:#7F1D1D;font-weight:600}
+.cmat td.cv-self{background:var(--g1);color:var(--g4)}
+.cmat .row-label{font-size:11px;font-weight:600;color:var(--g7);text-align:left;background:var(--g1)}
+.plan-section-title{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--g8);margin:18px 0 10px;display:flex;align-items:center;gap:7px}
+.plan-section-title::after{content:'';flex:1;height:1px;background:var(--g2)}
+
+@media(max-width:720px){
+  #t7 .compat-sel-wrap{grid-template-columns:1fr!important}
+  .date-row{flex-direction:column;align-items:stretch}
+  .plan-gen-btn{width:100%}
+}
+
+
+/* ── ЭКСТРЕННАЯ ПРОФИЛАКТИКА ── */
+.ep-box{margin-top:10px;padding:9px 12px;border-left:3px solid #EA580C;
+  background:#FFF7ED;border-radius:0 7px 7px 0}
+.ep-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:#EA580C;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.ep-text{font-size:11.5px;color:#7C2D12;line-height:1.6}
+
+</style>
+</head>
+<body>
+<div class="mob-header">
+  <button class="mob-btn" onclick="toggleSidebar()" aria-label="Параметры пациента">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="mob-logo">💉 VaxAdvisor</div>
+</div>
+<div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
+<div class="app">
+
+<aside class="sb">
+  <div class="logo">
+    <div class="logo-i">💉</div>
+    <div><div class="logo-t">VaxAdvisor</div><div class="logo-s">Рекомендации по вакцинации · РФ</div></div>
+  </div>
+  <div class="pt">Параметры пациента</div>
+  <div class="pr"><div class="pl">Возраст / Пол</div><div class="pv e" id="sp-age">Не указано</div></div>
+  <div class="pr"><div class="pl">Заболевания</div><div id="sp-cond"><div class="pv e">Не указано</div></div></div>
+  <div class="pr"><div class="pl">Анамнез</div><div id="sp-hist"><div class="pv e">Не указано</div></div></div>
+  <div class="pr"><div class="pl">Беременность</div><div id="sp-preg"><div class="pv e">Нет</div></div></div>
+  <div class="pr"><div class="pl">Профессия</div><div id="sp-occ"><div class="pv e">Не указано</div></div></div>
+  <div class="pr"><div class="pl">Регион / Поездки</div><div id="sp-tr"><div class="pv e">Не указано</div></div></div>
+  <div class="sb-stats">
+    <div class="stat"><div class="stat-n">30</div><div class="stat-l">вакцин</div></div>
+    <div class="stat"><div class="stat-n">12</div><div class="stat-l">нацкалендарь</div></div>
+  </div>
+  <div class="sb-f">Нацкалендарь РФ №1122н · ВОЗ · CDC<br>Информационный характер.</div>
+</aside>
+
+<main class="main">
+  <div class="ph"><h1>VaxAdvisor — Вакцинация РФ</h1><p>30 вакцин · Нацкалендарь · Эпидемические показания · Путешествия</p></div>
+
+  <div class="tbar">
+    <button class="tb act" onclick="switchTab('t1',this)">🔍 Подбор вакцин</button>
+    <button class="tb" onclick="switchTab('t2',this)">📅 Нацкалендарь</button>
+    <button class="tb" onclick="switchTab('t3',this)">🩺 По патологиям</button>
+    <button class="tb" onclick="switchTab('t4',this)">💊 По возбудителям</button>
+    <button class="tb" onclick="switchTab('t5',this)">🧪 Анализы</button>
+    <button class="tb" onclick="switchTab('t6',this)">📅 План</button>
+    <button class="tb" onclick="switchTab('t7',this)">🔄 Совместимость</button>
+  </div>
+
+<!-- TAB 1 -->
+<div id="t1" class="tc act">
+ <div id="fv">
+  <div class="sec" id="s-base">
+    <div class="sh" onclick="tog('s-base')"><div class="si" style="background:#ECFDF5">👤</div><span class="st">Основные параметры</span><span class="sbg" id="bg-base"></span><span class="cv">▾</span></div>
+    <div class="sb2"><div class="r2">
+      <div><label class="fl">Возраст (лет)</label><input type="number" id="age" min="0" max="120" placeholder="Например, 35" oninput="upd()"></div>
+      <div><label class="fl">Биологический пол</label><div class="sw"><select id="sex" onchange="upd();pvis()"><option value="">Выберите...</option><option value="male">Мужской</option><option value="female">Женский</option></select></div></div>
+    </div></div>
+  </div>
+
+  <div class="sec" id="s-hist">
+    <div class="sh" onclick="tog('s-hist')"><div class="si" style="background:#DBEAFE">📋</div><span class="st">Прививочный анамнез</span><span class="sbg" id="bg-hist"></span><div class="sec-acts" onclick="event.stopPropagation()"><button class="act-btn grn" onclick="checkCal()">✓ Нацкалендарь</button><button class="act-btn red" onclick="clearSec('s-hist')">✕ Очистить</button></div><span class="cv">▾</span></div>
+    <div class="sb2">
+      <div class="sub">Уже вакцинирован / перенёс</div>
+      <label class="ci"><input type="checkbox" value="hadBCG" onchange="upd()"><div class="cb"></div><span class="ct">БЦЖ (туберкулёз)<span class="cn">При рождении или в детстве</span></span></label>
+      <label class="ci"><input type="checkbox" value="hadHepB" onchange="upd()"><div class="cb"></div><span class="ct">Гепатит B — вакцинирован / перенёс</span></label>
+      <label class="ci"><input type="checkbox" value="hadMeasles" onchange="upd()"><div class="cb"></div><span class="ct">Корь — вакцинирован / перенёс</span></label>
+      <label class="ci"><input type="checkbox" value="hadRubella" onchange="upd()"><div class="cb"></div><span class="ct">Краснуха — вакцинирован / перенёс</span></label>
+      <label class="ci"><input type="checkbox" value="hadMumps" onchange="upd()"><div class="cb"></div><span class="ct">Паротит (эпидемический) — вакцинирован / перенёс</span></label>
+      <label class="ci"><input type="checkbox" value="hadVaricella" onchange="upd()"><div class="cb"></div><span class="ct">Ветряная оспа — вакцинирован / перенёс</span></label>
+      <label class="ci"><input type="checkbox" value="hadPolio" onchange="upd()"><div class="cb"></div><span class="ct">Полиомиелит — полная серия в детстве</span></label>
+      <label class="ci"><input type="checkbox" value="hadHPV" onchange="upd()"><div class="cb"></div><span class="ct">ВПЧ — вакцинирован</span></label>
+      <label class="ci"><input type="checkbox" value="hadTBE" onchange="upd()"><div class="cb"></div><span class="ct">Клещевой энцефалит — курс завершён</span></label>
+      <label class="ci"><input type="checkbox" value="hadCOVID" onchange="upd()"><div class="cb"></div><span class="ct">COVID-19 — первичная серия завершена<span class="cn">Ежегодная ревакцинация по-прежнему рекомендуется</span></span></label>
+      <label class="ci"><input type="checkbox" value="hadPneumoPCV" onchange="upd()"><div class="cb"></div><span class="ct">Пневмококк ПКВ13 (Превенар 13) — введён<span class="cn">Возможно, потребуется ППВ23 через ≥8 нед.</span></span></label>
+      <label class="ci"><input type="checkbox" value="hadPneumoPPV" onchange="upd()"><div class="cb"></div><span class="ct">Пневмококк ППВ23 (Пневмовакс 23) — введён</span></label>
+      <label class="ci"><input type="checkbox" value="hadMenACWY" onchange="upd()"><div class="cb"></div><span class="ct">Менингококк MCV4 (ACWY) — введён<span class="cn">Серогруппы A, C, W, Y. MenB (Бексеро) — отдельная вакцина</span></span></label>
+      <label class="ci"><input type="checkbox" value="hadZoster" onchange="upd()"><div class="cb"></div><span class="ct">Зостер (Шингрикс) — курс завершён (2 дозы)</span></label>
+      <label class="ci"><input type="checkbox" value="hadHepA" onchange="upd()"><div class="cb"></div><span class="ct">Гепатит A — вакцинирован / перенёс</span></label>
+    </div>
+  </div>
+
+  <div class="sec" id="s-cond">
+    <div class="sh" onclick="tog('s-cond')"><div class="si" style="background:#FEF3C7">🩺</div><span class="st">Заболевания и состояния здоровья</span><span class="sbg" id="bg-cond"></span><div class="sec-acts" onclick="event.stopPropagation()"><button class="act-btn red" onclick="clearSec('s-cond')">✕ Очистить</button></div><span class="cv">▾</span></div>
+    <div class="sb2">
+      <label class="ci"><input type="checkbox" value="diabetes" onchange="upd()"><div class="cb"></div><span class="ct">Сахарный диабет</span></label>
+      <label class="ci"><input type="checkbox" value="chronicLung" onchange="upd()"><div class="cb"></div><span class="ct">Хроническое заболевание лёгких (ХОБЛ, астма)</span></label>
+      <label class="ci"><input type="checkbox" value="chronicLiver" onchange="upd()"><div class="cb"></div><span class="ct">Хроническое заболевание печени / цирроз</span></label>
+      <label class="ci"><input type="checkbox" value="kidneyDisease" onchange="upd()"><div class="cb"></div><span class="ct">Хроническое заболевание почек / гемодиализ</span></label>
+      <label class="ci"><input type="checkbox" value="heartDisease" onchange="upd()"><div class="cb"></div><span class="ct">Хроническое заболевание сердца / ХСН</span></label>
+      <label class="ci"><input type="checkbox" value="asplenia" onchange="upd()"><div class="cb"></div><span class="ct">Аспления (удалённая / нефункционирующая селезёнка)</span></label>
+      <label class="ci"><input type="checkbox" value="splenectomy" onchange="upd()"><div class="cb"></div><span class="ct">Плановая спленэктомия (предстоит операция)</span></label>
+      <label class="ci"><input type="checkbox" value="immunodeficiency" onchange="upd()"><div class="cb"></div><span class="ct">Иммунодефицит / иммуносупрессия<span class="cn">Биологическая терапия, химиотерапия, трансплантация, кортикостероиды и др.</span></span></label>
+      <label class="ci"><input type="checkbox" value="hiv" onchange="upd()"><div class="cb"></div><span class="ct">ВИЧ-инфекция</span></label>
+    </div>
+  </div>
+
+  <div class="sec" id="s-preg" style="display:none">
+    <div class="sh" onclick="tog('s-preg')"><div class="si" style="background:#EDE9FE">🤰</div><span class="st">Репродуктивное здоровье</span><span class="sbg" id="bg-preg"></span><span class="cv">▾</span></div>
+    <div class="sb2">
+      <div class="tog" onclick="tsw('sw-pl')"><span class="tog-t">Планирование беременности</span><div class="tr" id="sw-pl"><div class="th"></div></div></div>
+      <div class="tog" onclick="tsw('sw-pg')"><span class="tog-t">Текущая беременность</span><div class="tr" id="sw-pg"><div class="th"></div></div></div>
+    </div>
+  </div>
+
+  <div class="sec" id="s-occ">
+    <div class="sh" onclick="tog('s-occ')"><div class="si" style="background:#DBEAFE">💼</div><span class="st">Профессия и факторы риска</span><span class="sbg" id="bg-occ"></span><div class="sec-acts" onclick="event.stopPropagation()"><button class="act-btn red" onclick="clearSec('s-occ')">✕ Очистить</button></div><span class="cv">▾</span></div>
+    <div class="sb2">
+      <div class="sub">Медицина и наука</div>
+      <label class="ci"><input type="checkbox" value="healthcare" onchange="upd()"><div class="cb"></div><span class="ct">Медицинский работник / фармацевт</span></label>
+      <label class="ci"><input type="checkbox" value="labGeneral" onchange="upd()"><div class="cb"></div><span class="ct">Микробиолог / бактериолог / клинический лаборант<span class="cn">Клинические и диагностические лаборатории общего профиля</span></span></label>
+      <label class="ci"><input type="checkbox" value="labOOI" onchange="upd()"><div class="cb"></div><span class="ct">Лаборатория особо опасных инфекций (ООИ)<span class="cn">Работа с возбудителями чумы, сибирской язвы, бруцеллёза, туляремии и др.</span></span></label>
+      <div class="sub">Сельское хозяйство и природа</div>
+      <label class="ci"><input type="checkbox" value="veterinary" onchange="upd()"><div class="cb"></div><span class="ct">Ветеринар / работник зоопарка</span></label>
+      <label class="ci"><input type="checkbox" value="livestock" onchange="upd()"><div class="cb"></div><span class="ct">Животновод / работник фермы / скотобойни</span></label>
+      <label class="ci"><input type="checkbox" value="forestry" onchange="upd()"><div class="cb"></div><span class="ct">Лесник / охотник / егерь / геолог / полевые работы</span></label>
+      <label class="ci"><input type="checkbox" value="agriculture" onchange="upd()"><div class="cb"></div><span class="ct">Работник агропрома / растениеводства</span></label>
+      <div class="sub">Прочие</div>
+      <label class="ci"><input type="checkbox" value="food" onchange="upd()"><div class="cb"></div><span class="ct">Работник общепита / водоснабжения</span></label>
+      <label class="ci"><input type="checkbox" value="sewage" onchange="upd()"><div class="cb"></div><span class="ct">Работник канализации / ЖКХ</span></label>
+      <label class="ci"><input type="checkbox" value="military" onchange="upd()"><div class="cb"></div><span class="ct">Военнослужащий / силовые структуры</span></label>
+      <label class="ci"><input type="checkbox" value="educator" onchange="upd()"><div class="cb"></div><span class="ct">Педагог / работник дошкольного образования</span></label>
+    </div>
+  </div>
+
+  <div class="sec" id="s-tr">
+    <div class="sh" onclick="tog('s-tr')"><div class="si" style="background:#FFEDD5">✈️</div><span class="st">Регион проживания и путешествия</span><span class="sbg" id="bg-tr"></span><div class="sec-acts" onclick="event.stopPropagation()"><button class="act-btn red" onclick="clearSec('s-tr')">✕ Очистить</button></div><span class="cv">▾</span></div>
+    <div class="sb2">
+      <div class="sub">Эндемичные регионы России</div>
+      <label class="ci"><input type="checkbox" value="tbe_region" onchange="upd()"><div class="cb"></div><span class="ct">Зона риска клещевого энцефалита<span class="cn">Сибирь, Урал, Дальний Восток, Поволжье, Северо-Запад</span></span></label>
+      <label class="ci"><input type="checkbox" value="glps_region" onchange="upd()"><div class="cb"></div><span class="ct">Эндемичный регион ГЛПС<span class="cn">Поволжье, Урал, Башкирия, Татарстан, Удмуртия</span></span></label>
+      <label class="ci"><input type="checkbox" value="tularemia_region" onchange="upd()"><div class="cb"></div><span class="ct">Эндемичный очаг туляремии<span class="cn">Центральная Россия, Поволжье, Зап. Сибирь</span></span></label>
+      <label class="ci"><input type="checkbox" value="plague_region" onchange="upd()"><div class="cb"></div><span class="ct">Природный очаг чумы<span class="cn">Астраханская обл., Калмыкия, Тыва, Горный Алтай</span></span></label>
+      <div class="sub">Международные поездки</div>
+      <label class="ci"><input type="checkbox" value="asia_south" onchange="upd()"><div class="cb"></div><span class="ct">Южная / Юго-Восточная Азия<span class="cn">Индия, Пакистан, Бангладеш, ЮВА</span></span></label>
+      <label class="ci"><input type="checkbox" value="africa_latin" onchange="upd()"><div class="cb"></div><span class="ct">Африка / Латинская Америка</span></label>
+      <label class="ci"><input type="checkbox" value="endemic_rabies" onchange="upd()"><div class="cb"></div><span class="ct">Регионы с высоким риском бешенства</span></label>
+      <label class="ci"><input type="checkbox" value="epidemic_zone" onchange="upd()"><div class="cb"></div><span class="ct">Зона эпидемий / гуманитарная миссия</span></label>
+    </div>
+  </div>
+
+  <div style="margin-top:12px">
+    <button class="btn" id="sub-btn" onclick="showRes()" disabled>💉 Получить рекомендации</button>
+  </div>
+  <div class="disc">⚠️ Информационный инструмент. Основан на Приказе Минздрава РФ №1122н, руководствах ВОЗ и CDC. Решение принимается совместно с лечащим врачом.</div>
+ </div>
+
+ <div id="rv" style="display:none">
+  <div class="rh">
+    <div><h2>Рекомендации готовы</h2><p id="r-sub"></p></div>
+    <div class="rc"><span class="rb r" id="cnt-r"></span><span class="rb o" id="cnt-o"></span><span id="cnt-cw" style="display:none"><span class="rb c" id="cnt-c"></span></span></div>
+  </div>
+  <div style="margin-bottom:11px"><button class="btn2" onclick="goBack()">← Изменить параметры</button></div>
+  <div id="rb2"></div>
+  <div class="disc">⚠️ Перед вакцинацией необходима консультация врача.</div>
+ </div>
+</div>
+
+<!-- TAB 2 -->
+<div id="t2" class="tc">
+  <div class="cleg">
+    <div class="cli"><div class="cld" style="background:#059669"></div>Обязательные</div>
+    <div class="cli"><div class="cld" style="background:#7C3AED"></div>Группы риска</div>
+    <div class="cli"><div class="cld" style="background:#2563EB"></div>Ежегодно</div>
+  </div>
+  <div id="cal-body"></div>
+  <div class="disc">Нацкалендарь РФ — Приказ Минздрава №1122н от 06.12.2021 (с изменениями).</div>
+</div>
+
+<!-- TAB 3 -->
+<div id="t3" class="tc">
+  <p style="font-size:12px;color:#4B5563;margin-bottom:12px">Схемы вакцинации при хронических заболеваниях и особых состояниях. Нажмите для раскрытия.</p>
+  <div id="path-body"></div>
+  <div class="disc">Схемы основаны на инструкциях к препаратам, Приказе №1122н и рекомендациях ВОЗ/CDC.</div>
+</div>
+
+
+<!-- TAB 4 -->
+<div id="t4" class="tc">
+  <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+    <input type="text" id="pth-q" placeholder="Поиск по возбудителю или вакцине..." oninput="filterPth()" style="flex:1;height:34px;border:1.5px solid var(--g2);border-radius:8px;padding:0 10px;font-family:var(--fb);font-size:13px;outline:none">
+    <span id="pth-cnt" style="font-size:11px;color:var(--g4);white-space:nowrap"></span>
+  </div>
+  <div id="pth-body"></div>
+<div id="combo-section" style="margin-top:18px"><div class="plan-section-title" style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--g8);margin:18px 0 10px;display:flex;align-items:center;gap:7px">💊 Комбинированные препараты<span style="flex:1;height:1px;background:var(--g2);display:block;margin-left:8px"></span></div><p style="font-size:12px;color:var(--g6);margin-bottom:12px">Вакцины против нескольких инфекций в одной инъекции — уменьшают число визитов и инъекций.</p><div id="combo-body"></div></div>
+</div>
+
+
+<!-- TAB 5: ANTIBODY ANALYSIS -->
+<div id="t5" class="tc">
+  <div class="ab-intro">
+    Введите результат анализа на антитела — система определит уровень иммунной защиты и даст рекомендацию по вакцинации. Поддерживаются количественные (числовые) и качественные (положит./сомнит./отрицат.) результаты.
+  </div>
+  <div id="ab-body"></div>
+</div>
+
+
+<!-- TAB 6: PLAN -->
+<div id="t6" class="tc">
+  <div id="plan-no-rec" class="plan-empty">
+    <div class="plan-empty-icon">📋</div>
+    <h3 style="font-family:var(--fd);font-size:14px;margin-bottom:6px">Сначала сформируйте рекомендации</h3>
+    <p style="font-size:12px;color:var(--g6)">Перейдите на вкладку «Подбор вакцин», заполните параметры и нажмите «Получить рекомендации» — план сгенерируется автоматически.</p>
+  </div>
+  <div id="plan-content" style="display:none">
+    <div class="date-row">
+      <div>
+        <label>Начать вакцинацию с</label>
+        <input type="date" id="plan-start-date" class="date-input">
+      </div>
+      <button class="plan-gen-btn" onclick="generatePlan()">📅 Обновить план</button>
+    </div>
+    <div id="plan-body"></div>
+    <div class="disc">⚠️ План является ориентировочным и основан на стандартных схемах введения. Точные даты и возможность одновременного введения вакцин согласуйте с врачом.</div>
+  </div>
+</div>
+
+<!-- TAB 7: COMPATIBILITY -->
+<div id="t7" class="tc">
+  <div class="compat-intro">
+    Проверьте, можно ли вводить две выбранные вакцины одновременно или с каким интервалом. Или проверьте совместимость всего вашего рекомендованного списка.
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+    <div>
+      <label class="fl">Вакцина 1</label>
+      <select class="compat-sel" id="cv1" onchange="checkCompat()">
+        <option value="">Выберите...</option>
+      </select>
+    </div>
+    <div>
+      <label class="fl">Вакцина 2</label>
+      <select class="compat-sel" id="cv2" onchange="checkCompat()">
+        <option value="">Выберите...</option>
+      </select>
+    </div>
+    <div>
+      <label class="fl">Вакцина 3 <span style="color:var(--g4);font-weight:400">(опц.)</span></label>
+      <select class="compat-sel" id="cv3" onchange="checkCompat()">
+        <option value="">— не выбрана —</option>
+      </select>
+    </div>
+  </div>
+  <div class="compat-result" id="compat-result"></div>
+  <button class="compat-all-btn" id="compat-all-btn" onclick="checkAllCompat()" style="display:none">
+    🔍 Проверить совместимость всех рекомендованных вакцин
+  </button>
+  <div id="compat-matrix-area"></div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ── VACCINE DATA ──
+const V={
+  bcg:      {n:'БЦЖ / БЦЖ-М (туберкулёз)',g:'Нацкалендарь',i:'🔵',c:1,d:'Новорождённым на 3–7 день. Ревакцинация в 7 лет при отриц. Диаскинтесте. Живая — противопоказана при иммунодефиците.'},
+  hepB:     {n:'Гепатит B (Регевак, Энджерикс-В)',g:'Нацкалендарь',i:'❤️',c:1,d:'3 дозы (0–1–6 мес.). Всем не вакцинированным 18–55 лет — нацкалендарь РФ.'},
+  tdap:     {n:'Дифтерия / Столбняк / Коклюш (АДС-М, АКДС, Пентаксим)',g:'Нацкалендарь',i:'💉',c:1,d:'Взрослым: ревакцинация АДС-М каждые 10 лет. При беременности — 1 доза на 27–36 нед.'},
+  polio:    {n:'Полиомиелит (ИПВ — Имовакс Полио; ОПВ — отечественная)',g:'Нацкалендарь',i:'💊',c:1,d:'Взрослым без полной серии — 3 дозы ИПВ. ОПВ противопоказана при иммунодефиците.'},
+  mmr:      {n:'Корь / Краснуха / Паротит (Приорикс, ММР-II)',g:'Нацкалендарь',i:'🟠',c:1,d:'2 дозы лицам без иммунитета. До 35 лет — обязательна. Живая — противопоказана при беременности.'},
+  varicella:{n:'Ветряная оспа (Варилрикс, Окавакс)',g:'Нацкалендарь',i:'🟡',c:1,d:'2 дозы с интервалом 6–10 нед. Живая — противопоказана при беременности и тяжёлом иммунодефиците.'},
+  rotavirus:{n:'Ротавирусная инфекция (РоТатек)',g:'Нацкалендарь',i:'🟢',c:1,d:'3 дозы: в 2, 4 и 6 мес. жизни. Только детям до 32 нед. жизни. В нацкалендаре с 2025 г.'},
+  influenza:{n:'Грипп (Гриппол Плюс, Совигрипп, Флю-М, Ультрикс Квадри)',g:'Нацкалендарь',i:'❄️',c:1,d:'Ежегодно осенью. При иммунодефиците — только инактивированная. В нацкалендаре РФ.'},
+  covid:    {n:'COVID-19 (Спутник V, КовиВак, Спутник Лайт)',g:'Нацкалендарь',i:'🔬',c:1,d:'Первичная серия + ежегодная ревакцинация. При тяжёлом иммунодефиците — предпочтительна КовиВак.'},
+  hpv:      {n:'ВПЧ (Гардасил 4, Гардасил 9, Церварикс)',g:'По возрасту',i:'🟣',c:0,d:'До 26 лет — рекомендована всем. 27–45 — по решению врача. Нацкалендарь с 2025 (девочки 12–13 лет). 9–14 лет: 2 дозы (0 и +6 мес., мин. интервал 5 мес.); 15+: 3 дозы (0–2–6 мес.). При иммунодефиците — всегда 3 дозы.'},
+  zoster:   {n:'Опоясывающий лишай (Шингрикс)',g:'По возрасту',i:'🛡️',c:0,d:'С 50 лет. 2 дозы с интервалом 2–6 мес. Инактивированная — разрешена при иммуносупрессии. Защита ~90%.'},
+  rsv:      {n:'РСВ (Абрисво — беременным; Арексви — пожилым)',g:'По возрасту',i:'🔵',c:0,d:'Абрисво — беременным на 32–36 нед. Арексви / Абрисво — лицам 60+ однократно. Зарегистрированы в РФ.'},
+  pneumo:   {n:'Пневмококк (Превенар 13, Пневмовакс 23, Пневмо-23)',g:'По показаниям',i:'🔵',c:0,d:'ПКВ13 → ≥8 нед → ППВ23. При 65+, диабете, ХОБЛ, болезнях сердца/почек, аспении, ВИЧ, иммунодефиците.'},
+  meningococcal:{n:'Менингококк (Менактра, Бексеро, Менвео)',g:'По показаниям',i:'🔴',c:0,d:'При аспении, иммунодефиците, ВИЧ, военнослужащим, студентам общежитий. MCV4: 1–2 дозы; MenB: 2–3 дозы.'},
+  hib:      {n:'Hib — гемофильная инфекция (Акт-ХИБ, Хиберикс)',g:'По показаниям',i:'🔵',c:0,d:'Взрослым при аспении, иммунодефиците, ВИЧ. В нацкалендаре детям в составе Пентаксима / Инфанрикс Гекса.'},
+  hepA:     {n:'Гепатит A (Хаврикс, Аваксим, ГЕП-А-ин-ВАК, Альгавак М)',g:'По показаниям',i:'❤️',c:0,d:'2 дозы (0 и 6–18 мес.). При хр. болезнях печени, ВИЧ, работе с едой, поездках в эндемичные регионы.'},
+  tbe:      {n:'Клещевой энцефалит (ЭнцеВир, ФСМЕ-Иммун, Энцепур)',g:'Эпидемические',i:'🕷️',c:0,d:'Жителям эндемичных регионов. 3 дозы, ревакцинация каждые 3 года. Экстренная схема: 0–14 дн. – 9–12 мес.'},
+  glps:     {n:'ГЛПС — хантавирус (Хантавак)',g:'Эпидемические',i:'🔴',c:0,d:'Единственная в мире вакцина против хантавируса. Зарегистрирована только в РФ и Китае. 2 дозы, ревакцинация через 2 года.'},
+  tularemia:{n:'Туляремия (живая туляремийная вакцина ЖТВ)',g:'Эпидемические',i:'🐇',c:0,d:'Жители эндемичных районов, охотники, фермеры. Однократно, ревакцинация через 5 лет. Живая — противопоказана при иммунодефиците.'},
+  leptospirosis:{n:'Лептоспироз (вакцина лептоспирозная концентрированная)',g:'Эпидемические',i:'💧',c:0,d:'Ветеринары, животноводы, работники ЖКХ, охотники. Ежегодная вакцинация (1 доза перед сезоном).'},
+  brucellosis:{n:'Бруцеллёз (живая бруцеллёзная вакцина ЖБВ)',g:'Эпидемические',i:'🐄',c:0,d:'Ветеринары, животноводы, работники мясокомбинатов. Однократно, ревакцинация через 1 год. Живая — противопоказана при беременности.'},
+  anthrax:  {n:'Сибирская язва (вакцина СТИ)',g:'Эпидемические',i:'⚠️',c:0,d:'Ветеринары, зоотехники, рабочие мясоперерабатывающих предприятий и кожзаводов. 2 дозы, ревакцинация ежегодно.'},
+  plague:   {n:'Чума (живая чумная вакцина ЕВ ННИИПМ)',g:'Эпидемические',i:'⚠️',c:0,d:'Жители природных очагов (Астраханская обл., Калмыкия, Тыва, Горный Алтай), полевые работники. Однократно.'},
+  qfever:   {n:'Ку-лихорадка (вакцина Ку-лихорадочная М-44)',g:'Эпидемические',i:'🔥',c:0,d:'Животноводы, ветеринары, работники мясокомбинатов. Однократно, ревакцинация через 1–3 года. Проба Бёрнета предварительно.'},
+  typhus:   {n:'Сыпной тиф (сыпнотифозная вакцина)',g:'Эпидемические',i:'⚠️',c:0,d:'Работники противочумных учреждений, персонал с риккетсиями. По специальным эпидемиологическим показаниям.'},
+  typhoid:  {n:'Брюшной тиф (Тифивак, Вианвак, Тифим Ви)',g:'Путешествия',i:'✈️',c:0,d:'Поездки в Южную Азию, Африку, Латинскую Америку. Однократно. Ревакцинация через 3 года.'},
+  yellowFever:{n:'Жёлтая лихорадка (Стамарил)',g:'Путешествия',i:'🌍',c:0,d:'Обязательна для въезда в ряд стран Африки и Юж. Америки. 1 доза, пожизненная защита. Только в уполномоченных центрах.'},
+  japanesEncephalitis:{n:'Японский энцефалит (Иксиаро)',g:'Путешествия',i:'🌏',c:0,d:'Длительные поездки в сельские районы Азии. 2 дозы с интервалом 28 дней.'},
+  rabies:   {n:'Бешенство — доконтактная профилактика (КоКАВ, Рабипур)',g:'Путешествия',i:'🐾',c:0,d:'Поездки в эндемичные районы, ветеринары. 3 дозы (0–7–21/28 дн.). Ревакцинация через 1 год, затем каждые 5 лет.'},
+  cholera:  {n:'Холера (Дюкорал — оральная вакцина)',g:'Путешествия',i:'💧',c:0,d:'Зоны эпидемий, гуманитарные миссии. 2 дозы с интервалом 1–6 нед. Ревакцинация через 2 года.'},
+};
+const GO=['Нацкалендарь','По возрасту','По показаниям','Эпидемические','Путешествия'];
+
+// ── CALENDAR DATA ──
+const CAL=[
+  {s:'Новорождённые и грудной возраст',rows:[
+    {b:'1–24 ч',bc:'n0',t:'Первые сутки',v:[{c:'vm',txt:'💉 Гепатит B (1-я доза)'}]},
+    {b:'3–7 дн.',bc:'n0',t:'Первая неделя жизни',v:[{c:'vm',txt:'💉 БЦЖ-М (туберкулёз)'}]},
+    {b:'2 мес.',bc:'n1',t:'2 месяца',v:[{c:'vm',txt:'💉 Гепатит B (2-я доза)'},{c:'vm',txt:'🔵 Пневмококк (1-я доза)'},{c:'vm',txt:'🟢 Ротавирус (1-я доза)'}]},
+    {b:'3 мес.',bc:'n1',t:'3 месяца',v:[{c:'vm',txt:'💉 АКДС (1-я доза)'},{c:'vm',txt:'💊 Полиомиелит ИПВ (1-я доза)'},{c:'vr',txt:'💉 Hib (1-я доза — группы риска)'}]},
+    {b:'4,5 мес.',bc:'n1',t:'4,5 месяца',v:[{c:'vm',txt:'💉 АКДС (2-я доза)'},{c:'vm',txt:'💊 Полиомиелит ИПВ (2-я доза)'},{c:'vm',txt:'🔵 Пневмококк (2-я доза)'},{c:'vm',txt:'🟢 Ротавирус (2-я доза)'},{c:'vr',txt:'💉 Hib (2-я доза — группы риска)'}]},
+    {b:'6 мес.',bc:'n1',t:'6 месяцев',v:[{c:'vm',txt:'💉 АКДС (3-я доза)'},{c:'vm',txt:'💉 Гепатит B (3-я доза)'},{c:'vm',txt:'💊 Полиомиелит ОПВ (3-я доза)'},{c:'vm',txt:'🟢 Ротавирус (3-я доза)'},{c:'vr',txt:'💉 Hib (3-я доза — группы риска)'},{c:'va',txt:'❄️ Грипп (с 6 мес. — ежегодно)'}]},
+  ]},
+  {s:'Дети до 3 лет',rows:[
+    {b:'12 мес.',bc:'n2',t:'1 год',v:[{c:'vm',txt:'🟠 КПК (1-я доза)'}]},
+    {b:'15 мес.',bc:'n2',t:'1 год 3 месяца',v:[{c:'vm',txt:'🔵 Пневмококк (ревакцинация)'},{c:'vm',txt:'🟡 Ветряная оспа (1-я доза)'}]},
+    {b:'18 мес.',bc:'n2',t:'1 год 6 месяцев',v:[{c:'vm',txt:'💉 АКДС (ревакцинация 1)'},{c:'vm',txt:'💊 Полиомиелит ОПВ (ревакцинация 1)'},{c:'vr',txt:'💉 Hib (ревакцинация — группы риска)'}]},
+    {b:'20 мес.',bc:'n2',t:'1 год 8 месяцев',v:[{c:'vm',txt:'💊 Полиомиелит ОПВ (ревакцинация 2)'}]},
+    {b:'3 года',bc:'n2',t:'3 года',v:[{c:'vm',txt:'🟡 Ветряная оспа (2-я доза)'}]},
+  ]},
+  {s:'Дети школьного возраста',rows:[
+    {b:'6 лет',bc:'n3',t:'Перед 1 классом',v:[{c:'vm',txt:'🟠 КПК (ревакцинация)'}]},
+    {b:'6–7 лет',bc:'n3',t:'6–7 лет',v:[{c:'vm',txt:'💉 АДС-М (ревакцинация 2)'},{c:'vr',txt:'💉 БЦЖ (ревакц. при отриц. Диаскинтесте)'}]},
+    {b:'14 лет',bc:'n4',t:'14 лет',v:[{c:'vm',txt:'💉 АДС-М (ревакцинация 3)'},{c:'vm',txt:'💊 Полиомиелит ОПВ (ревакцинация 3)'}]},
+  ]},
+  {s:'Подростки и взрослые',rows:[
+    {b:'12–13 ♀',bc:'n4',t:'Девочки — с 2025 года',v:[{c:'vm',txt:'🟣 ВПЧ (2 дозы: 0 и +6 мес.)'}]},
+    {b:'18–35 лет',bc:'n5',t:'Корь — если не болели / не привиты',v:[{c:'vm',txt:'🟠 Корь (1–2 дозы)'}]},
+    {b:'18–25 ♀',bc:'n5',t:'Женщины — краснуха',v:[{c:'vm',txt:'🟠 Краснуха (1 доза — если не привита)'}]},
+    {b:'18–55 лет',bc:'n5',t:'Гепатит B — если не болели / не привиты',v:[{c:'vm',txt:'💉 Гепатит B (3 дозы: 0–1–6 мес.)'}]},
+    {b:'каждые 10 л.',bc:'n5',t:'Все взрослые — дифтерия и столбняк',v:[{c:'vm',txt:'💉 АДС-М (ревакцинация)'}]},
+    {b:'ежегодно',bc:'n5',t:'Ежегодная вакцинация для всех',v:[{c:'va',txt:'❄️ Грипп (Гриппол, Совигрипп, Флю-М)'},{c:'va',txt:'🔬 COVID-19 (Спутник V, КовиВак)'}]},
+  ]},
+];
+
+// ── PATHOLOGY DATA ──
+function sch(steps){
+  return '<div class="sch">'+steps.map((s,i)=>`<div class="ss">${i>0?'<div class="sln"></div>':''}<div class="sn"><div class="sd${s[2]?' '+s[2]:''}">${s[0]}</div><div class="sl">${s[1]}</div></div></div>`).join('')+'</div>';
+}
+const PATH=[
+  {id:'p-diab',ico:'🩸',bg:'#FEF3C7',t:'Сахарный диабет',cnt:'4 вакцины',
+   body:`<div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк (Превенар 13 / Пневмовакс 23)</div><div class="pvs">Двухэтапная схема. Повышенный риск пневмонии при диабете.</div>${sch([['ПКВ13','День 0'],['ППВ23','+8 нед.'],['ППВ23','sr','+5 лет']])}</div></div>
+   <div class="pvr"><div class="pvi">❤️</div><div><div class="pvn">Гепатит B (Регевак, Энджерикс-В)</div><div class="pvs">3 дозы. Риск передачи через общие глюкометры.</div>${sch([['Д1','День 0'],['Д2','+1 мес.'],['Д3','+6 мес.']])}</div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп</div><div class="pvs">Ежегодно. Диабетики — в нацкалендаре РФ.</div></div></div>
+   <div class="pvr"><div class="pvi">🔬</div><div><div class="pvn">COVID-19</div><div class="pvs">Первичная серия + ежегодная ревакцинация.</div></div></div>`},
+  {id:'p-lung',ico:'💨',bg:'#DBEAFE',t:'Хронические болезни лёгких (ХОБЛ, астма)',cnt:'3 вакцины',
+   body:`<div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк</div><div class="pvs">ПКВ13 → ≥8 нед → ППВ23, ревакцинация через 5 лет.</div></div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп</div><div class="pvs">Ежегодно. В нацкалендаре РФ для ХОБЛ и астмы.</div></div></div>
+   <div class="pvr"><div class="pvi">🔬</div><div><div class="pvn">COVID-19</div><div class="pvs">Первичная серия + ежегодная ревакцинация.</div></div></div>`},
+  {id:'p-liv',ico:'❤️',bg:'#FEE2E2',t:'Хронические болезни печени / цирроз',cnt:'4 вакцины',
+   body:`<div class="pvr"><div class="pvi">❤️</div><div><div class="pvn">Гепатит A (Хаврикс, Аваксим)</div><div class="pvs">Суперинфекция при ЦП — риск острой печёночной недостаточности.</div>${sch([['Д1','День 0'],['Д2','+6–18 мес.']])}</div></div>
+   <div class="pvr"><div class="pvi">❤️</div><div><div class="pvn">Гепатит B</div><div class="pvs">3 дозы (0–1–6 мес.). При ЦП — возможна удвоенная доза.</div></div></div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк</div><div class="pvs">ПКВ13 → ≥8 нед → ППВ23.</div></div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп</div><div class="pvs">Ежегодно.</div></div></div>`},
+  {id:'p-hiv',ico:'🔴',bg:'#EDE9FE',t:'ВИЧ-инфекция',cnt:'7 вакцин',
+   body:`<div class="pnot">⚠️ Оптимально при CD4 >200 кл/мкл. При CD4 <200 — живые вакцины (КПК, варицелла) могут быть противопоказаны.</div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк</div><div class="pvs">ПКВ13 → ≥8 нед → ППВ23, ревакц. через 5 лет.</div></div></div>
+   <div class="pvr"><div class="pvi">🔴</div><div><div class="pvn">Менингококк (Менактра MCV4)</div><div class="pvs">2 дозы с интервалом 8 нед., ревакцинация каждые 5 лет.</div>${sch([['Д1','День 0'],['Д2','+8 нед.'],['Ревакц.','sr','каждые 5 л.']])}</div></div>
+   <div class="pvr"><div class="pvi">❤️</div><div><div class="pvn">Гепатит A + Гепатит B</div><div class="pvs">HepA: 2 дозы (0 и +6–18 мес.). HepB: 3 дозы (0–1–6 мес.). Контроль анти-HBs через 1–2 мес.</div></div></div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Hib</div><div class="pvs">1 доза однократно.</div></div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп (только инактивированная)</div><div class="pvs">Ежегодно. Живая — противопоказана.</div></div></div>
+   <div class="pvr"><div class="pvi">🔬</div><div><div class="pvn">COVID-19 (предпочтительна КовиВак при низком CD4)</div><div class="pvs">Первичная серия + ревакцинация.</div></div></div>`},
+  {id:'p-asp',ico:'⚠️',bg:'#FFEDD5',t:'Аспления / спленэктомия',cnt:'4 вакцины — срочно',
+   body:`<div class="pnot">⚠️ Плановая: вакцинировать за 2 нед. до операции. Экстренная: через 2 нед. после. Риск молниеносного сепсиса (OPSI) — летальность до 50%.</div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк (ПКВ13 + ППВ23)</div><div class="pvs">Пневмококк — главная причина OPSI. ПКВ13 → ≥8 нед → ППВ23 → ревакц. через 5 лет.</div></div></div>
+   <div class="pvr"><div class="pvi">🔴</div><div><div class="pvn">Менингококк (MCV4 + MenB)</div><div class="pvs">2 дозы MCV4 с интервалом 8 нед., ревакцинация каждые 5 лет. MenB: 2–3 дозы.</div></div></div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Hib (Акт-ХИБ)</div><div class="pvs">1 доза, если не вакцинирован ранее.</div></div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп</div><div class="pvs">Ежегодно — провоцирует бактериальные суперинфекции.</div></div></div>`},
+  {id:'p-imm',ico:'🛡️',bg:'#EDE9FE',t:'Иммунодефицит / иммуносупрессия',cnt:'5 вакцин + противопоказания',
+   body:`<div class="pcon">⛔ Живые вакцины противопоказаны при иммунодефиците/иммуносупрессии: КПК, ветрянка, зостер (живой), БЦЖ, ОПВ, туляремийная, бруцеллёзная, чумная. При лёгкой иммуносупрессии некоторые живые вакцины возможны — по решению врача.</div>
+   <div class="pnot">💡 Вакцинировать до начала иммуносупрессивной терапии (за 2–4 нед.). Зостер (Шингрикс) — инактивированный, разрешён при иммуносупрессии.</div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк</div><div class="pvs">ПКВ13 → ≥8 нед → ППВ23, ревакц. через 5 лет.</div></div></div>
+   <div class="pvr"><div class="pvi">🔴</div><div><div class="pvn">Менингококк</div><div class="pvs">2 дозы MCV4, ревакцинация каждые 5 лет.</div></div></div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Hib</div><div class="pvs">1 доза однократно.</div></div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп (только инактивированная)</div><div class="pvs">Ежегодно. Гриппол Плюс, Совигрипп.</div></div></div>
+   <div class="pvr"><div class="pvi">🔬</div><div><div class="pvn">COVID-19 (предпочтительна КовиВак)</div><div class="pvs">Инактивированная при тяжёлом иммунодефиците.</div></div></div>`},
+  {id:'p-preg',ico:'🤰',bg:'#EDE9FE',t:'Беременность',cnt:'3 вакцины + противопоказания',
+   body:`<div class="pcon">⛔ Противопоказаны (живые): КПК, ветряная оспа, зостер (живой), БЦЖ, ОПВ.</div>
+   <div class="pvr"><div class="pvi">💉</div><div><div class="pvn">АДС-М (дифтерия, столбняк)</div><div class="pvs">Обязательна при каждой беременности. Защита новорождённого от коклюша через трансплацентарные антитела.</div>${sch([['АДС-М','27–36 нед.']])}</div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп (инактивированная)</div><div class="pvs">На любом сроке. Только инактивированная. Нацкалендарь РФ.</div></div></div>
+   <div class="pvr"><div class="pvi">🔬</div><div><div class="pvn">COVID-19</div><div class="pvs">Предпочтительно II–III триместр. Одобрена ВОЗ и ACOG.</div></div></div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">РСВ — Абрисво</div><div class="pvs">1 доза на 32–36 нед. Защита новорождённого через материнские антитела.</div>${sch([['Абрисво','32–36 нед.']])}</div></div>`},
+  {id:'p-prec',ico:'❤️',bg:'#D1FAE5',t:'Планирование беременности',cnt:'4 вакцины — до зачатия',
+   body:`<div class="pnot">⚠️ Живые вакцины (КПК, ветрянка) — минимум за 1 месяц до зачатия.</div>
+   <div class="pvr"><div class="pvi">🟠</div><div><div class="pvn">КПК (корь, краснуха, паротит)</div><div class="pvs">Проверить иммунитет серологически. Краснуха в I триместре — синдром врождённой краснухи.</div>${sch([['КПК','Сейчас'],['Зачатие','≥1 мес. позже']])}</div></div>
+   <div class="pvr"><div class="pvi">🟡</div><div><div class="pvn">Ветряная оспа (Варилрикс)</div><div class="pvs">2 дозы с интервалом 6–10 нед. Зачатие — ≥1 мес. после Д2.</div>${sch([['Д1','Сейчас'],['Д2','+6–10 нед.'],['Зачатие','≥1 мес. после Д2']])}</div></div>
+   <div class="pvr"><div class="pvi">💉</div><div><div class="pvn">АДС-М</div><div class="pvs">Обновить ревакцинацию, если прошло >10 лет.</div></div></div>
+   <div class="pvr"><div class="pvi">❤️</div><div><div class="pvn">Гепатит B</div><div class="pvs">Завершить серию до беременности. Передаётся новорождённому при родах.</div></div></div>`},
+  {id:'p-eld',ico:'👴',bg:'#F3F4F6',t:'Пожилой возраст (65+)',cnt:'5 вакцин',
+   body:`<div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">Пневмококк</div><div class="pvs">ПКВ13 → ≥8 нед → ППВ23. Рекомендован всем 65+.</div></div></div>
+   <div class="pvr"><div class="pvi">❄️</div><div><div class="pvn">Грипп (высокодозный / адъювантный)</div><div class="pvs">Ежегодно. В нацкалендаре для 60+.</div></div></div>
+   <div class="pvr"><div class="pvi">🛡️</div><div><div class="pvn">Зостер / Опоясывающий лишай (Шингрикс)</div><div class="pvs">С 50 лет. Инактивированная — разрешена при иммуносупрессии. Защита ~90%.</div>${sch([['Д1','День 0'],['Д2','+2–6 мес.']])}</div></div>
+   <div class="pvr"><div class="pvi">🔵</div><div><div class="pvn">РСВ (Арексви / Абрисво)</div><div class="pvs">С 60 лет однократно. Защита от тяжёлого РСВ-бронхита.</div></div></div>
+   <div class="pvr"><div class="pvi">🔬</div><div><div class="pvn">COVID-19</div><div class="pvs">Ежегодная ревакцинация — особенно важна для 65+.</div></div></div>`},
+  {id:'p-tbe',ico:'🕷️',bg:'#FEF3C7',t:'Клещевой энцефалит — эндемичные регионы',cnt:'Схема вакцинации',
+   body:`<div class="pvr"><div class="pvi">🕷️</div><div><div class="pvn">Клещевой энцефалит (ЭнцеВир, ФСМЕ-Иммун, Энцепур)</div><div class="pvs">Стандартная схема: 3 дозы. Ревакцинация каждые 3 года. Заканчивать за 2 нед. до выезда в лес. Экстренная схема (ЭнцеВир): Д1 → +14 дн. → Д3 через 9–12 мес.</div>${sch([['Д1','День 0'],['Д2','+1–3 мес.'],['Д3','+9–12 мес.'],['Ревакц.','sr','каждые 3 г.']])}</div></div>`},
+];
+
+// ── SIDEBAR LABELS ──
+const CL={diabetes:'Диабет',chronicLung:'Хр.лёгкие',chronicLiver:'Хр.печень',kidneyDisease:'Хр.почки',heartDisease:'Хр.сердце',asplenia:'Аспления',splenectomy:'Спленэктомия',immunodeficiency:'Иммунодефицит/иммуносупрессия',hiv:'ВИЧ'};
+const HL={hadBCG:'✓БЦЖ',hadHepB:'✓HepB',hadMeasles:'✓Корь',hadRubella:'✓Краснуха',hadMumps:'✓Паротит',hadVaricella:'✓Ветрянка',hadPolio:'✓Полио',hadHPV:'✓ВПЧ',hadTBE:'✓КЭ',hadCOVID:'✓COVID',hadPneumoPCV:'✓ПКВ13',hadPneumoPPV:'✓ППВ23',hadMenACWY:'✓МенACWY',hadZoster:'✓Зостер',hadHepA:'✓HepA'};
+const OL={healthcare:'Медработник',labGeneral:'Микробиолог',labOOI:'Лаборат. ООИ',veterinary:'Ветеринар',livestock:'Животновод',forestry:'Лесник/охотник',agriculture:'Агропром',food:'Общепит',sewage:'ЖКХ',military:'Военный',educator:'Педагог'};
+const TL={tbe_region:'КЭ-регион',glps_region:'ГЛПС-регион',tularemia_region:'Туляремия',plague_region:'Чума',asia_south:'Ю.Азия',africa_latin:'Африка/Лат.Ам.',endemic_rabies:'Бешенство',epidemic_zone:'Эпидзона'};
+
+// ── UI HELPERS ──
+
+
+function toggleSidebar(){
+  const sb=document.querySelector('.sb');
+  const ov=document.getElementById('sb-overlay');
+  sb.classList.toggle('mob-open');
+  ov.classList.toggle('on');
+  document.body.style.overflow=sb.classList.contains('mob-open')?'hidden':'';
+}
+// Закрываем сайдбар при переходе на вкладку
+const _origSwitch=window.switchTab;
+window.switchTab=function(id,btn){
+  _origSwitch(id,btn);
+  const sb=document.querySelector('.sb');
+  if(sb.classList.contains('mob-open'))toggleSidebar();
+};
+
+function checkCal(){
+  // Отмечаем все прививки нацкалендаря в анамнезе
+  const calVals=['hadBCG','hadHepB','hadMeasles','hadRubella','hadMumps','hadVaricella','hadPolio'];
+  document.querySelectorAll('#s-hist input[type=checkbox]').forEach(cb=>{
+    if(calVals.includes(cb.value)) cb.checked=true;
+  });
+  upd();
+}
+
+function clearSec(id){
+  const sec=document.getElementById(id);
+  if(!sec)return;
+  sec.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+  sec.querySelectorAll('.tr.on').forEach(tr=>tr.classList.remove('on'));
+  upd();
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tc').forEach(e=>e.classList.remove('act'));
+  document.querySelectorAll('.tb').forEach(e=>e.classList.remove('act'));
+  document.getElementById(id).classList.add('act');
+  btn.classList.add('act');
+}
+function tog(id){document.getElementById(id).classList.toggle('col');}
+function tsw(id){document.getElementById(id).classList.toggle('on');upd();}
+function isOn(id){return document.getElementById(id).classList.contains('on');}
+function chk(sec){return[...document.querySelectorAll('#'+sec+' input[type=checkbox]:checked')].map(c=>c.value);}
+function mkChips(vals,labels,cls=''){return vals.length?'<div class="chips">'+vals.map(v=>`<span class="chip${cls}">${labels[v]||v}</span>`).join('')+'</div>':'<div class="pv e">Не указано</div>';}
+function setBadge(id,n){const e=document.getElementById(id);if(e){e.textContent=n||'';e.classList.toggle('vis',n>0);}}
+function pvis(){
+  const s=document.getElementById('sex').value;
+  document.getElementById('s-preg').style.display=s==='female'?'':'none';
+  if(s!=='female'){['sw-pl','sw-pg'].forEach(i=>document.getElementById(i).classList.remove('on'));}
+  upd();
+}
+function togglePath(id){
+  const e=document.getElementById(id);e.classList.toggle('op');e.classList.toggle('cl');
+}
+
+function upd(){
+  const age=document.getElementById('age').value,sex=document.getElementById('sex').value;
+  const conds=chk('s-cond'),hist=chk('s-hist'),occ=chk('s-occ'),tr=chk('s-tr');
+  const plan=isOn('sw-pl'),preg=isOn('sw-pg');
+  const sxL=sex==='male'?'Мужской':sex==='female'?'Женский':'';
+  const ae=document.getElementById('sp-age');
+  if(age||sxL){ae.className='pv';ae.textContent=(age?age+' лет':'—')+' · '+(sxL||'—');}
+  else{ae.className='pv e';ae.textContent='Не указано';}
+  document.getElementById('sp-cond').innerHTML=conds.length?mkChips(conds,CL):'<div class="pv e">Не указано</div>';
+  document.getElementById('sp-hist').innerHTML=hist.length?mkChips(hist,HL):'<div class="pv e">Не указано</div>';
+  const pi=[plan&&'Планирование',preg&&'Беременность'].filter(Boolean);
+  document.getElementById('sp-preg').innerHTML=pi.length?mkChips(pi,{Планирование:'Планирование',Беременность:'Беременность'},''):'<div class="pv e">Нет</div>';
+  document.getElementById('sp-occ').innerHTML=occ.length?mkChips(occ,OL,' hl'):'<div class="pv e">Не указано</div>';
+  document.getElementById('sp-tr').innerHTML=tr.length?mkChips(tr,TL,' wn'):'<div class="pv e">Не указано</div>';
+  setBadge('bg-cond',conds.length);setBadge('bg-hist',hist.length);
+  setBadge('bg-occ',occ.length);setBadge('bg-tr',tr.length);
+  setBadge('bg-preg',pi.length);
+  document.getElementById('s-base').classList.toggle('hv',!!(age&&sex));
+  document.getElementById('s-cond').classList.toggle('hv',conds.length>0);
+  document.getElementById('s-hist').classList.toggle('hv',hist.length>0);
+  document.getElementById('s-occ').classList.toggle('hv',occ.length>0);
+  document.getElementById('s-tr').classList.toggle('hv',tr.length>0);
+  document.getElementById('sub-btn').disabled=!(age&&sex);
+  if(typeof updateTgMain!=='undefined')updateTgMain();
+  if(typeof saveToCloud!=='undefined')saveToCloud();
+}
+
+// ── RECOMMENDATION LOGIC ──
+function getRec(p){
+  const{age,sex,hist,conds,plan,preg,occ,tr}=p;
+  const rec=new Set(),opt=new Set(),contra=new Set(),notes={};
+  const an=(id,n)=>{if(n)notes[id]=(notes[id]?notes[id]+' '+n:n);};
+  const hH=v=>hist.includes(v),hC=v=>conds.includes(v),hO=v=>occ.includes(v),hT=v=>tr.includes(v);
+
+  if(!hH('hadBCG')){opt.add('bcg');an('bcg','Перед ревакцинацией взрослых — проба Диаскинтест/Манту.');}
+  if(!hH('hadHepB'))rec.add('hepB');
+  rec.add('tdap');
+  an('tdap','↺ Ревакцинация каждые 10 лет.');
+  if(preg)an('tdap','⚠️ Обязательна в 27–36 нед. каждой беременности.');
+  if(plan)an('tdap','Убедитесь в актуальности ревакцинации до зачатия.');
+  if(!hH('hadPolio')){rec.add('polio');an('polio','Взрослым без полной серии — 3 дозы ИПВ. ОПВ (живая, оральная) применяется только как 3-я и последующие дозы у детей. Нельзя контактировать с новорождёнными и иммунодефицитными лицами 2 мес. после ОПВ.');}
+  (function(){
+    var noM=!hH('hadMeasles'),noR=!hH('hadRubella'),noP=!hH('hadMumps');
+    if(!noM&&!noR&&!noP) return;
+    if(preg){
+      contra.add('mmr');
+      an('mmr','⛔ Живая вакцина. Противопоказана при беременности — вакцинируйтесь после родов.');
+    } else {
+      rec.add('mmr');
+      var missing=[noM&&'корь',noR&&'краснуха',noP&&'паротит'].filter(Boolean);
+      if(missing.length<3) an('mmr','Отсутствует иммунитет к: '+missing.join(', ')+'. КПК покрывает все три компонента.');
+      if(plan&&noR) an('mmr','⚠️ Краснуха особенно важна до беременности — минимум за 1 мес. до зачатия.');
+    }
+  })();
+  if(!hH('hadVaricella')){if(preg){contra.add('varicella');an('varicella','⛔ Живая. Противопоказана при беременности.');}else{rec.add('varicella');if(plan)an('varicella','⚠️ Минимум за 1 месяц до зачатия.');}}
+  if(age<=1)rec.add('rotavirus');
+  rec.add('influenza');
+  an('influenza','↺ Вводится ежегодно.');
+  if(preg||plan)an('influenza','⚠️ Особенно важна при беременности — нацкалендарь РФ.');
+  if(hC('immunodeficiency'))an('influenza','Только инактивированная вакцина.');
+  rec.add('covid');
+  if(age<=45&&!hH('hadHPV')){if(age<=26){rec.add('hpv');}else{opt.add('hpv');an('hpv','27–45 лет — решение принимается с врачом.');}}
+  if(age>=50){rec.add('zoster');if(age>=70)an('zoster','Особенно важна: высокий риск постгерпетической невралгии.');}
+  if(age>=60)opt.add('rsv');
+  if(preg){rec.add('rsv');an('rsv','⚠️ Абрисво на 32–36 нед. — защита новорождённого.');}
+  if(age>=65)rec.add('pneumo');
+  if(hC('diabetes')){rec.add('pneumo');rec.add('hepB');}
+  if(hC('chronicLung'))rec.add('pneumo');
+  if(hC('chronicLiver')){if(!hH('hadHepA'))rec.add('hepA');rec.add('hepB');an('hepA','Хр. болезнь печени — нацкалендарь по эпидпоказаниям.');}
+  if(hC('kidneyDisease')){rec.add('pneumo');rec.add('hepB');an('hepB','Почечная недостаточность / гемодиализ — приоритет.');}
+  if(hC('heartDisease')){
+    rec.add('pneumo');
+    if(age>=60) rec.add('rsv');
+    else if(age>=50){ opt.add('rsv'); an('rsv','При хр. заболеваниях сердца вакцинация от РСВ может обсуждаться с врачом — повышенный риск тяжёлых форм.'); }
+  }
+  if(hC('asplenia')||hC('splenectomy')){
+    rec.add('pneumo');rec.add('meningococcal');rec.add('hib');rec.add('hepB');
+    an('pneumo','⚠️ Критически важна при аспении! Риск OPSI.');
+    an('meningococcal','⚠️ Обязательна при аспении.');
+    if(hC('splenectomy'))an('pneumo','Вакцинируйтесь минимум за 2 нед. до плановой операции.');
+  }
+  if(hC('immunodeficiency')){
+    rec.add('pneumo');rec.add('meningococcal');rec.add('hib');
+    ['mmr','varicella','zoster','bcg','tularemia','brucellosis','plague'].forEach(v=>{
+      rec.delete(v);opt.delete(v);if(!contra.has(v)){contra.add(v);an(v,'⛔ Живая вакцина — противопоказана при иммунодефиците/иммуносупрессии. Уточните допустимость у врача.');}
+    });
+  }
+  if(hC('hiv')){rec.add('pneumo');rec.add('meningococcal');if(!hH('hadHepA'))rec.add('hepA');rec.add('hepB');rec.add('hib');}
+  if(hO('healthcare')){rec.add('hepB');if(!hH('hadHepA'))rec.add('hepA');rec.add('meningococcal');an('hepB','Обязательна для медработников — нацкалендарь РФ.');}
+  if(hO('labGeneral')){
+    if(!hH('hadHepB'))rec.add('hepB');
+    if(!hH('hadHepA'))rec.add('hepA');
+    rec.add('meningococcal');rec.add('pneumo');
+    an('hepB','Обязательна для всех лабораторных работников.');
+  }
+  if(hO('labOOI')){
+    if(!hH('hadHepB'))rec.add('hepB');
+    if(!hH('hadHepA'))rec.add('hepA');
+    rec.add('tularemia');rec.add('brucellosis');rec.add('anthrax');rec.add('qfever');rec.add('plague');rec.add('typhus');
+    rec.add('meningococcal');rec.add('pneumo');
+    an('tularemia','Лаборатории ООИ — по нацкалендарю, независимо от региона.');
+    an('brucellosis','Обязательна при работе с культурами Brucella.');
+  }
+  if(hO('veterinary')){rec.add('rabies');rec.add('leptospirosis');rec.add('brucellosis');rec.add('anthrax');rec.add('qfever');an('rabies','Обязательна для ветеринаров — нацкалендарь РФ.');}
+  if(hO('livestock')){rec.add('brucellosis');rec.add('leptospirosis');rec.add('anthrax');rec.add('qfever');}
+  if(hO('forestry')){rec.add('tbe');an('tbe','↺ Ревакцинация каждые 3 года от последней дозы.');rec.add('leptospirosis');rec.add('tularemia');rec.add('rabies');an('tbe','⚠️ Полевые работы — высокий приоритет.');}
+  if(hO('agriculture')){rec.add('tularemia');rec.add('leptospirosis');}
+  if(hO('food')){if(!hH('hadHepA'))rec.add('hepA');an('hepA','Работники общепита — нацкалендарь РФ.');}
+  if(hO('sewage')){rec.add('leptospirosis');if(!hH('hadHepA'))rec.add('hepA');}
+  if(hO('military')){rec.add('meningococcal');rec.add('tularemia');rec.add('anthrax');}
+  if(hT('tbe_region')&&!hH('hadTBE')){rec.add('tbe');an('tbe','Жители эндемичного региона — ревакцинация каждые 3 года.');}
+  if(hT('glps_region'))rec.add('glps');
+  if(hT('tularemia_region'))rec.add('tularemia');
+  if(hT('plague_region')){rec.add('plague');an('plague','По решению санитарной службы.');}
+  if(hT('asia_south')){rec.add('typhoid');opt.add('cholera');if(!hH('hadHepA'))rec.add('hepA');opt.add('japanesEncephalitis');opt.add('rabies');an('cholera','Актуальна для Индии и других стран ЮА — высокий риск диареи путешественников.');}
+  if(hT('africa_latin')){rec.add('yellowFever');opt.add('typhoid');rec.add('cholera');if(!hH('hadHepA'))rec.add('hepA');opt.add('rabies');}
+  if(hT('endemic_rabies'))rec.add('rabies');
+  if(hT('epidemic_zone')){rec.add('cholera');rec.add('typhoid');}
+  // Фильтр: если уже вакцинирован/перенёс — убираем из рекомендаций
+  if(hH('hadHepB'))  { rec.delete('hepB');   opt.delete('hepB');   }
+  // Серотипы пневмококка: ПКВ13 + ППВ23 = полная схема
+  if(rec.has('pneumo')){
+    if(hH('hadPneumoPCV')&&hH('hadPneumoPPV')){ rec.delete('pneumo'); opt.delete('pneumo'); }
+    else if(hH('hadPneumoPCV')&&!hH('hadPneumoPPV')){
+      an('pneumo','Введён ПКВ13. Следующий шаг — ППВ23 через ≥8 нед. от ПКВ13 (если не введён). Ревакцинация ППВ23 через 5 лет.');
+    } else if(!hH('hadPneumoPCV')&&hH('hadPneumoPPV')){
+      an('pneumo','Введён ППВ23. Рассмотрите ПКВ13 (Превенар 13) — он добавляет конъюгированный иммунитет к 13 серотипам.');
+    }
+  }
+  // Менингококк: MCV4 (ACWY) и MenB — разные серогруппы
+  if(rec.has('meningococcal')){
+    if(hH('hadMenACWY')){
+      an('meningococcal','Введён MCV4 (ACWY). Рассмотрите дополнительно MenB (Бексеро) — он закрывает серогруппу B, которая не входит в MCV4.');
+    }
+  }
+  // COVID: если серия завершена — только ежегодная ревакцинация
+  if(rec.has('covid')&&hH('hadCOVID')) an('covid','↺ Первичная серия завершена — ежегодная ревакцинация (1 доза).');
+  // Зостер: если курс завершён
+  if(hH('hadZoster')){ rec.delete('zoster'); opt.delete('zoster'); }
+  if(hH('hadHepA'))  { rec.delete('hepA');   opt.delete('hepA');   }
+  if(hH('hadTBE'))   { rec.delete('tbe');    opt.delete('tbe');    }
+  if(hH('hadPolio')) { rec.delete('polio');  opt.delete('polio');  }
+  if(hH('hadRotavirus')){ rec.delete('rotavirus'); opt.delete('rotavirus'); }
+  for(const id of rec)opt.delete(id);
+  for(const id of contra){rec.delete(id);opt.delete(id);}
+  return{rec:[...rec],opt:[...opt],contra:[...contra],notes};
+}
+
+function renderVax(ids,type,notes){
+  if(!ids.length)return'';
+  const groups={};
+  for(const id of ids){const v=V[id];if(!v)continue;if(!groups[v.g])groups[v.g]=[];groups[v.g].push(id);}
+  const tl=type==='r'?'Рекомендована':type==='o'?'Опциональная':'Противопоказана';
+  let h='';
+  for(const g of GO){
+    if(!groups[g])continue;
+    h+=`<div class="gl">${g}</div>`;
+    groups[g].forEach((id,i)=>{
+      const v=V[id],no=notes[id]?`<div class="vno">${notes[id]}</div>`:'',cal=v.c?'<span class="vcal">Нацкалендарь</span>':'';
+      h+=`<div class="vc ${type}" style="animation-delay:${i*30}ms"><div class="vi">${v.i}</div><div class="vcc"><div class="vt"><span class="vn">${v.n}</span><span class="vtg ${type}">${tl}</span>${cal}</div><div class="vd">${v.d}</div>${no}</div></div>`;
+    });
+  }
+  return h;
+}
+
+function showRes(){
+  const age=parseInt(document.getElementById('age').value),sex=document.getElementById('sex').value;
+  const res=getRec({age,sex,hist:chk('s-hist'),conds:chk('s-cond'),plan:sex==='female'&&isOn('sw-pl'),preg:sex==='female'&&isOn('sw-pg'),occ:chk('s-occ'),tr:chk('s-tr')});
+  document.getElementById('r-sub').textContent=`${age} лет · ${sex==='male'?'Мужской пол':'Женский пол'}`;
+  document.getElementById('cnt-r').textContent=`${res.rec.length} рекомендовано`;
+  document.getElementById('cnt-o').textContent=`${res.opt.length} опциональных`;
+  const cw=document.getElementById('cnt-cw');
+  if(res.contra.length){document.getElementById('cnt-c').textContent=`${res.contra.length} противопоказано`;cw.style.display='';}else cw.style.display='none';
+  let b='';
+  if(res.rec.length)b+=`<div class="tyh"><div class="tyd" style="background:#059669"></div><div class="tyt">Рекомендованные</div><div class="tyc">— ${res.rec.length}</div></div>`+renderVax(res.rec,'r',res.notes);
+  if(res.opt.length)b+=`<div class="tyh"><div class="tyd" style="background:#D97706"></div><div class="tyt">Опциональные</div><div class="tyc">— ${res.opt.length}</div></div>`+renderVax(res.opt,'o',res.notes);
+  if(res.contra.length)b+=`<div class="tyh"><div class="tyd" style="background:#DC2626"></div><div class="tyt">Противопоказания</div><div class="tyc">— ${res.contra.length}</div></div>`+renderVax(res.contra,'c',res.notes);
+  if(!res.rec.length&&!res.opt.length)b=`<div class="es"><div style="font-size:34px;margin-bottom:10px">✅</div><h3 style="font-family:var(--fd);margin-bottom:4px">Нет новых рекомендаций</h3><p style="color:#4B5563;font-size:12px">По указанным параметрам дополнительные вакцины не требуются.</p></div>`;
+  document.getElementById('rb2').innerHTML=b;
+  document.getElementById('fv').style.display='none';
+  document.getElementById('rv').style.display='block';
+  if(typeof tg!=='undefined'&&tg){tg.BackButton.show();tg.MainButton.hide();}
+  window.scrollTo(0,0);
+}
+function goBack(){document.getElementById('rv').style.display='none';document.getElementById('fv').style.display='';if(typeof tg!=='undefined'&&tg){tg.BackButton.hide();updateTgMain();}}
+
+// ── BUILD CALENDAR ──
+(function(){
+  let h='';
+  CAL.forEach(sec=>{
+    h+=`<div class="cst">${sec.s}</div>`;
+    sec.rows.forEach(row=>{
+      h+=`<div class="cac"><div class="cah"><div class="cab ${row.bc}">${row.b}</div><div class="cat">${row.t}</div></div><div class="cvx">${row.v.map(vx=>`<span class="cv2 ${vx.c}">${vx.txt}</span>`).join('')}</div></div>`;
+    });
+  });
+  document.getElementById('cal-body').innerHTML=h;
+})();
+
+// ── BUILD PATHOLOGY ──
+(function(){
+  const h=PATH.map(p=>`<div class="pc cl" id="${p.id}">
+    <div class="ph2" onclick="togglePath('${p.id}')">
+      <div class="pic" style="background:${p.bg}">${p.ico}</div>
+      <div class="ptl">${p.t}</div><div class="pcnt">${p.cnt}</div><span class="pchv">▾</span>
+    </div>
+    <div class="pb">${p.body}</div>
+  </div>`).join('');
+  document.getElementById('path-body').innerHTML=h;
+})();
+
+upd();
+
+// ── PATHOGEN DATA ──
+const TYPE={live:'Живая',inact:'Инактивир.',rec:'Рекомбинантная',combo:'Комбинированная',oral:'Оральная',mono:'Моноклональное АТ',ps:'Полисахаридная',conj:'Конъюгированная',vec:'Векторная',sub:'Субъединичная',pep:'Пептидная'};
+const TCLS={live:'live',inact:'inact',rec:'rec',combo:'combo',oral:'oral',mono:'mono',ps:'inact',conj:'rec',vec:'rec',sub:'rec',pep:'rec'};
+
+const PTH=[
+ {id:'pt-flu',e:'🤧',n:'Грипп (Influenza)',tp:'РНК-вирус, сезонная мутация',col:'#DBEAFE',
+  d:'Ежегодная вакцинация обязательна из-за антигенного дрейфа. Рекомендована всем с 6 мес. В нацкалендаре: дети, беременные, 60+, медработники, пациенты с хр. заболеваниями.',
+  contra:'Анафилаксия на белок куриного яйца (абсолютное — для яйцесодержащих: Гриппол Плюс, Совигрипп, Флю-М; Ультрикс Квадри производится на клеточных культурах — альтернатива). Тяжёлые реакции на предыдущие дозы. Аллергия на формальдегид, полиоксидоний, гентамицин. Для живых форм (интраназальных) — беременность, тяжёлый иммунодефицит.',
+   vx:[
+   {n:'Гриппол Плюс',m:'Петровакс Фарм (РФ)',t:'sub',a:'С 6 мес.',dose:'1 доза (дети до 3 лет: 0,25 мл×2)',note:'3 штамма + адъювант полиоксидоний. Нацкалендарь.'},
+   {n:'Совигрипп',m:'Нацимбио (РФ)',t:'sub',a:'С 6 мес.',dose:'1 доза',note:'3 штамма. Нацкалендарь.'},
+   {n:'Ультрикс Квадри',m:'Форт (РФ)',t:'sub',a:'С 6 мес.',dose:'1 доза',note:'4 штамма (2A+2B). Квадривалентная — оптимальное покрытие.'},
+   {n:'Флю-М / Флю-М Тетра',m:'СПбНИИВС ФМБА (РФ)',t:'sub',a:'С 18 лет',dose:'1 доза',note:'Трёх- и четырёхштаммовая версии.'},
+  ]},
+ {id:'pt-covid',e:'🦠',n:'COVID-19 (SARS-CoV-2)',tp:'РНК-коронавирус',col:'#D1FAE5',
+  d:'Первичная серия + ежегодная ревакцинация. При иммунодефиците предпочтительна инактивированная КовиВак. В нацкалендаре.',
+  contra:'Тяжёлые аллергические реакции (анафилаксия) на предыдущую дозу. Острые инфекционные заболевания и обострение хронических (временное). Возраст до 12 лет (Спутник V) или до 18 лет (в зависимости от препарата).',
+   vx:[
+   {n:'Спутник V (Гам-КОВИД-Вак)',m:'НИЦЭМ им. Гамалеи (РФ)',t:'vec',a:'С 18 лет',dose:'2 дозы (0 и +21 день)',note:'Гетерологичная векторная: Ad26 + Ad5.'},
+   {n:'Спутник Лайт',m:'НИЦЭМ им. Гамалеи (РФ)',t:'vec',a:'С 18 лет',dose:'1 доза',note:'Применяется как ревакцинация.'},
+   {n:'КовиВак',m:'Центр им. Чумакова (РФ)',t:'inact',a:'С 18 лет',dose:'2 дозы (0 и +14 дней)',note:'Цельновирионная. Предпочтительна при иммунодефиците и аутоиммунных заболеваниях.'},
+   {n:'ЭпиВакКорона-Н',m:'ГНЦ ВБ «Вектор» (РФ)',t:'pep',a:'С 18 лет',dose:'2 дозы (0 и +21 день)',note:'Пептидная рекомбинантная.'},
+  ]},
+ {id:'pt-pneumo',e:'💨',n:'Пневмококковая инфекция',tp:'Streptococcus pneumoniae, >90 серотипов',col:'#DBEAFE',
+  d:'Вызывает пневмонию, менингит, сепсис. В нацкалендаре для детей. Показана 65+, при диабете, ХОБЛ, болезнях сердца/почек, аспении, ВИЧ, иммунодефиците.',
+  contra:'Аллергия на компоненты вакцины. ПКВ13 (Превенар 13) — аллергия на дифтерийный белок CRM197. ППВ23 — детям до 2 лет (неэффективна). Острые инфекционные заболевания.',
+   vx:[
+   {n:'Превенар 13 (PCV13)',m:'Pfizer (США)',t:'conj',a:'С 6 нед. / взрослые',dose:'Дети: 3+1 или 2+1 дозы. Взрослые: 1 доза',note:'13 серотипов. Конъюгированная с CRM197. Нацкалендарь.'},
+   {n:'Синфлорикс (PCV10)',m:'GSK (Бельгия)',t:'conj',a:'С 6 нед. до 5 лет',dose:'3+1 дозы',note:'10 серотипов + Hib. Нацкалендарь.'},
+   {n:'Пневмовакс 23 / Пневмо-23',m:'MSD (США) / Sanofi (Франция)',t:'ps',a:'С 2 лет',dose:'1 доза, ревакцинация через 5 лет',note:'23 серотипа. Полисахаридная — не формирует иммунологическую память. Вводится после ПКВ13 (≥8 нед.).'},
+  ]},
+ {id:'pt-mening',e:'🧠',n:'Менингококковая инфекция',tp:'Neisseria meningitidis, серогруппы A B C W Y',col:'#FEE2E2',
+  d:'Молниеносный менингит и сепсис. Показана при аспении, иммунодефиците, ВИЧ, военным, студентам общежитий, путешественникам (Африка — «менингитный пояс»).',
+  contra:'Аллергия на дифтерийный анатоксин (Менактра) или столбнячный анатоксин (МенКвадфи). Острые инфекционные заболевания. Для полисахаридной вакцины — детям до 18 мес.',
+   ep:{title:'Химиопрофилактика контактных (не вакцинация!)', text:'<strong>Для контактных 1-го порядка</strong> (совместное проживание, медперсонал без СИЗ): начать <strong>в течение 24 часов</strong>.<br>• <strong>Ципрофлоксацин 500 мг</strong> внутрь однократно (взрослым).<br>• <strong>Рифампицин</strong> 600 мг 2 р/сут × 2 дня (альтернатива, беременным).<br>• <strong>Цефтриаксон 250 мг</strong> в/м однократно (беременным или при непереносимости).<br><em>Вакцинация контактных также проводится, но не заменяет химиопрофилактику — иммунитет формируется дольше!</em>'},
+   vx:[
+   {n:'Менактра (MCV4-D)',m:'Sanofi (США)',t:'conj',a:'С 9 мес.',dose:'1–2 дозы. При аспении/ВИЧ: 2 дозы с интервалом 8 нед.',note:'Серогруппы ACWY. Конъюгированная с дифтерийным анатоксином. Нацкалендарь.'},
+   {n:'МенКвадфи (MCV4-TT)',m:'Sanofi (Франция/США)',t:'conj',a:'С 12 мес.',dose:'1–2 дозы',note:'Серогруппы ACWY. Конъюгированная со столбнячным анатоксином. Лучший ответ на серогруппу A.'},
+   {n:'Менвео (MCV4)',m:'GSK (Италия)',t:'conj',a:'С 2 лет',dose:'1–2 дозы',note:'Серогруппы ACWY.'},
+   {n:'Бексеро (4CMenB)',m:'GSK (Италия)',t:'rec',a:'С 2 мес.',dose:'2–4 дозы (зависит от возраста)',note:'Серогруппа B. Рекомбинантная. Единственная для Men B в РФ. Не в нацкалендаре.'},
+   {n:'Менингококковая вакцина A+C (отечественная)',m:'Нацимбио (РФ)',t:'ps',a:'С 18 мес.',dose:'1 доза',note:'Полисахаридная. Ограниченный иммунный ответ.'},
+  ]},
+ {id:'pt-hepb',e:'❤️',n:'Гепатит B (HBV)',tp:'ДНК-вирус (Hepadnaviridae)',col:'#FEF3C7',
+  d:'3 дозы (0–1–6 мес.). В нацкалендаре с рождения и для взрослых 18–55 лет. Приоритет: медработники, диабетики, пациенты на гемодиализе, половые контакты носителей.',
+  contra:'Аллергия на пекарские дрожжи (Saccharomyces cerevisiae) — рекомбинантные вакцины производятся на их основе! Острые инфекционные заболевания. Тяжёлые реакции на предыдущие дозы.',
+   ep:{title:'Постэкспозиционная профилактика (укол, половой контакт)', text:'<strong>Алгоритм</strong> (начать в течение <strong>24 часов</strong>):<br>1. <strong>HBIG (иммуноглобулин против гепатита B)</strong>: 0,06 мл/кг в/м — при контакте с HBsAg-положительным материалом.<br>2. <strong>Вакцина гепатита B</strong>: одновременно с HBIG (в другую конечность), затем стандартная серия (1 и 6 мес.).<br><strong>Медработникам</strong>: после укола — вымыть с мылом, не выжимать кровь, обработать 70% спиртом. Контроль анти-HBs через 6 нед.<br><em>Чем раньше начата профилактика — тем выше её эффективность.</em>'},
+   vx:[
+   {n:'Регевак В',m:'Нацимбио (РФ)',t:'rec',a:'С рождения',dose:'0,5 мл (дети) / 1,0 мл (взрослые)',note:'Рекомбинантная дрожжевая. Нацкалендарь.'},
+   {n:'Энджерикс-В',m:'GSK (Бельгия)',t:'rec',a:'С рождения',dose:'10 мкг (дети) / 20 мкг (взрослые)',note:''},
+   {n:'Эувакс B',m:'Sanofi Pasteur (Корея)',t:'rec',a:'С рождения',dose:'Как Регевак',note:''},
+   {n:'Бубо-М (HepB + АДС-М)',m:'Комбиотех (РФ)',t:'combo',a:'С 6 лет',dose:'По схеме АДС-М',note:'Комбинированная: гепатит B + дифтерия + столбняк. Для ревакцинации.'},
+  ]},
+ {id:'pt-hepa',e:'❤️',n:'Гепатит A (HAV)',tp:'РНК-вирус (Picornaviridae)',col:'#FEF3C7',
+  d:'2 дозы — пожизненный иммунитет. Показан: хр. болезни печени, ВИЧ, работники общепита/водоснабжения, поездки в Индию, Среднюю Азию, Африку, Латинскую Америку.',
+  contra:'Острые инфекционные заболевания и обострение хронических. Аллергия на компоненты (2-феноксиэтанол, гидроксид алюминия). Для ГЕП-А-ин-ВАК — возраст до 3 лет.',
+   ep:{title:'Постэкспозиционная профилактика', text:'<strong>После контакта с больным гепатитом A</strong>:<br>• <strong>Вакцина гепатита A</strong>: лицам старше 1 года — в течение <strong>2 недель</strong> после контакта (предпочтительно). Эффективна у здоровых взрослых.<br>• <strong>Иммуноглобулин нормальный</strong>: для лиц 1–40 лет — в течение 2 нед. (при противопоказаниях к вакцинации); >40 лет, иммунодефицит, хр. болезни печени — предпочтительнее иммуноглобулин.<br><em>Вакцина и иммуноглобулин можно вводить одновременно в разные конечности.</em>'},
+   vx:[
+   {n:'Хаврикс 720 / 1440',m:'GSK (Бельгия)',t:'inact',a:'720 — с 1 г. до 18 лет; 1440 — с 18 лет',dose:'2 дозы (0 и +6–12 мес.)',note:'Наиболее изученная вакцина.'},
+   {n:'Аваксим 80 / 160',m:'Sanofi (Франция)',t:'inact',a:'80 — 12 мес.–15 лет; 160 — с 16 лет',dose:'2 дозы (0 и +6–18 мес.)',note:''},
+   {n:'ГЕП-А-ин-ВАК',m:'ГНЦ ВБ «Вектор» (РФ)',t:'inact',a:'С 3 лет',dose:'2 дозы',note:'Нацкалендарь по эпидпоказаниям.'},
+   {n:'Альгавак М',m:'Нацимбио (РФ)',t:'inact',a:'С 3 лет',dose:'2 дозы',note:''},
+  ]},
+ {id:'pt-measles',e:'🟠',n:'Корь (Measles)',tp:'РНК-вирус (Paramyxoviridae, Morbillivirus)',col:'#FFEDD5',
+  d:'2 дозы (12 мес. и 6 лет). Взрослым без иммунитета до 35 лет — по нацкалендарю. Медработникам — обязательно. Живая — противопоказана при беременности и тяжёлом иммунодефиците. Проверка иммунитета: IgG ≥200 мМЕ/мл.',
+  contra:'Беременность. Тяжёлый иммунодефицит (ВИЧ при CD4 <200). Аллергия на неомицин, желатин.',
+   ep:{title:'Экстренная постэкспозиционная профилактика', text:'<strong>После контакта с больным корью:</strong><br>• <strong>Живая вакцина КПК</strong>: в течение <strong>72 часов</strong> после контакта — здоровым лицам без иммунитета (≥6 мес.). Эффективность ~83%.<br>• <strong>Иммуноглобулин нормальный</strong>: до <strong>6 суток</strong> — для лиц с противопоказаниями к вакцинации (беременные, грудные дети до 6 мес., тяжёлый иммунодефицит). 0,25–0,5 мл/кг.<br><em>Немедленно обратитесь в поликлинику — время критично!</em>'},
+   vx:[
+   {n:'ЖКВ (живая коревая вакцина)',m:'Нацимбио (РФ)',t:'live',a:'С 12 мес.',dose:'2 дозы с интервалом ≥28 дней',note:'Нацкалендарь. Монопрепарат — для очагов кори.'},
+   {n:'Приорикс / КПК-М',m:'GSK / Нацимбио',t:'live',a:'С 12 мес.',dose:'2 дозы',note:'В составе тривалентной КПК.'},
+  ]},
+ {id:'pt-rubella',e:'🟠',n:'Краснуха (Rubella)',tp:'РНК-вирус (Togaviridae, Rubivirus)',col:'#FFEDD5',
+  d:'Критически важна женщинам репродуктивного возраста — краснуха в I триместре вызывает синдром врождённой краснухи (СВК). Нацкалендарь: женщинам 18–25 лет. До беременности — за ≥1 мес. Проверка иммунитета: IgG краснухи ≥25 МЕ/мл.',
+  contra:'Беременность (абсолютное). Тяжёлый иммунодефицит. Аллергия на неомицин.',
+   ep:{title:'Экстренная профилактика при контакте', text:'<strong>Беременным без иммунитета</strong>: специфического иммуноглобулина нет. Нормальный иммуноглобулин в дозе 20 мл может частично снизить риск, но <strong>не гарантирует защиты</strong>. Решение принимает врач.<br><strong>Небеременным без иммунитета</strong>: вакцинация КПК до контакта — единственная надёжная защита. После контакта вакцинация не эффективна.<br><em>Ключевая стратегия — вакцинация ДО планирования беременности.</em>'},
+   vx:[
+   {n:'ЖРВ (живая краснушная вакцина)',m:'Нацимбио (РФ)',t:'live',a:'С 12 мес.',dose:'1–2 дозы',note:'Нацкалендарь. Монопрепарат для вакцинации женщин.'},
+   {n:'Приорикс / КПК-М',m:'GSK / Нацимбио',t:'live',a:'С 12 мес.',dose:'2 дозы',note:'В составе тривалентной КПК.'},
+  ]},
+ {id:'pt-mumps',e:'🟠',n:'Эпидемический паротит (Mumps)',tp:'РНК-вирус (Paramyxoviridae, Rubulavirus)',col:'#FFEDD5',
+  d:'Особенно опасен для мужчин — орхит при паротите в 20–30% приводит к атрофии яичка. Иммунитет после 2 доз КПК нередко снижается через 10–15 лет. Нацкалендарь: в 12 мес. и 6 лет.',
+  contra:'Беременность. Тяжёлый иммунодефицит. Аллергия на неомицин, желатин.',
+   vx:[
+   {n:'ЖПВ (живая паротитная вакцина)',m:'Нацимбио (РФ)',t:'live',a:'С 12 мес.',dose:'2 дозы',note:'Нацкалендарь. Монопрепарат.'},
+   {n:'Приорикс / КПК-М',m:'GSK / Нацимбио',t:'live',a:'С 12 мес.',dose:'2 дозы',note:'В составе тривалентной КПК.'},
+  ]},
+ {id:'pt-varic',e:'🟡',n:'Ветряная оспа (VZV)',tp:'ДНК-вирус (Herpesviridae)',col:'#FEF3C7',
+  d:'2 дозы. В нацкалендаре с 2025: 15 мес. и 3 года. Живая — противопоказана беременным и при тяжёлом иммунодефиците. До беременности — за ≥1 мес.',
+  contra:'Беременность (живая вакцина — контрацепция 1 мес. после вакцинации). Тяжёлый иммунодефицит. Аллергия на неомицин, желатин. ВИЧ при CD4 <200 кл/мкл.',
+   vx:[
+   {n:'Варилрикс',m:'GSK (Бельгия)',t:'live',a:'С 9 мес.',dose:'2 дозы с интервалом 6–10 нед.',note:'Штамм Oka. Нацкалендарь. Основная вакцина в РФ.'},
+   {n:'Окавакс',m:'Biken / Sanofi (Япония)',t:'live',a:'С 12 мес.',dose:'1–2 дозы',note:'Штамм Oka. 1 доза — защита ~82%, 2 дозы — >95%.'},
+  ]},
+ {id:'pt-zoster',e:'🛡️',n:'Опоясывающий лишай (Herpes Zoster)',tp:'ДНК-вирус (Herpesviridae, реактивация VZV)',col:'#EDE9FE',
+  d:'С 50 лет. 2 дозы с интервалом 2–6 мес. Инактивированная (Шингрикс) — разрешена при иммуносупрессии. Защита от заболевания ~90%, от невралгии — 89%.',
+  contra:'Острая фаза опоясывающего лишая или ветряной оспы. Аллергия на компоненты. Шингрикс — инактивированная, НЕ противопоказана при иммуносупрессии! Беременность — данных недостаточно, рекомендуется отложить.',
+   vx:[
+   {n:'Шингрикс (RZV)',m:'GSK (Бельгия)',t:'rec',a:'С 50 лет',dose:'2 дозы (0 и +2–6 мес.)',note:'Рекомбинантная субъединичная + адъювант AS01B. Единственная инактивированная вакцина против зостера. Зарегистрирована в РФ.'},
+  ]},
+ {id:'pt-hpv',e:'🟣',n:'ВПЧ (Вирус папилломы человека)',tp:'ДНК-вирус (Papillomaviridae, >200 типов)',col:'#EDE9FE',
+  d:'Профилактика рака шейки матки, рака ротоглотки, аногенитальных бородавок. До 26 лет — рекомендована всем. Девочки 12–13 лет — нацкалендарь с 2025.',
+  contra:'Беременность (рекомендуется завершить серию до зачатия). Аллергия на дрожжи (для Гардасил). Аллергия на компоненты вакцины. Острые инфекционные заболевания.',
+   vx:[
+   {n:'Гардасил 9 (9vHPV)',m:'MSD (Нидерланды)',t:'rec',a:'С 9 лет',dose:'9–14 лет: 2 дозы (0 и +6 мес., мин. интервал 5 мес.). 15+: 3 дозы (0, +2, +6 мес.). При иммунодефиците — всегда 3 дозы.',note:'9 типов ВПЧ (6,11,16,18,31,33,45,52,58). Покрывает ~90% ВПЧ-ассоциированных раков. Если 2-я доза введена <5 мес. после 1-й — добавить 3-ю.'},
+   {n:'Гардасил 4 (4vHPV)',m:'MSD (Нидерланды)',t:'rec',a:'С 9 лет',dose:'9–14 лет: 2 дозы (0 и +6 мес.). 15+: 3 дозы (0, +2, +6 мес.).',note:'4 типа ВПЧ (6,11,16,18). Защита от остроконечных кондилом и основных онкогенных типов.'},
+   {n:'Церварикс (2vHPV)',m:'GSK (Бельгия)',t:'rec',a:'С 9 лет',dose:'До 15 лет: 2 дозы (0 и +6 мес., мин. 5 мес.). 15+: 3 дозы (0, +1, +6 мес.). При иммунодефиците — 3 дозы.',note:'2 онкогенных типа (16, 18) + адъювант AS04. Только онкогенные ВПЧ, не защищает от бородавок.'},
+  ]},
+ {id:'pt-dtp',e:'💉',n:'Дифтерия / Столбняк / Коклюш',tp:'Бактерии (Corynebacterium, Clostridium, Bordetella)',col:'#D1FAE5',
+  d:'Первичная серия в детстве. Взрослым: ревакцинация АДС-М каждые 10 лет. При беременности: 27–36 нед. В нацкалендаре.',
+  contra:'Прогрессирующая неврологическая патология, неконтролируемая эпилепсия (коклюшный компонент). Тяжёлые реакции на предыдущую дозу (температура >40°C, судороги). Острые инфекционные заболевания. АДС-М — ограничений значительно меньше.',
+   ep:{title:'Экстренная профилактика столбняка при травмах', text:'<strong>Алгоритм при загрязнённых ранах</strong>:<br>• Ранее вакцинирован (3+ доз, последняя <5 лет): <strong>ничего не требуется</strong>.<br>• Последняя прививка 5–10 лет назад: <strong>АДС-М 1 доза</strong>.<br>• Не вакцинирован или неизвестный анамнез: <strong>АДС-М + ПСЧИГ 250 МЕ</strong>. При отсутствии ПСЧИГ — лошадиная антитетанусная сыворотка (АС).<br>• При чистых незначительных ранах: только АДС-М (без ПСЧИГ), если последняя прививка более 10 лет назад.<br><em>ПСЧИГ вводится в другую конечность, одновременно с анатоксином — но в разные шприцы!</em>'},
+   vx:[
+   {n:'АКДС',m:'Нацимбио (РФ)',t:'inact',a:'С 3 мес.',dose:'3 дозы + ревакцинация в 18 мес.',note:'Цельноклеточный коклюш. Нацкалендарь. Чаще вызывает реакции.'},
+   {n:'АДС-М',m:'Нацимбио (РФ)',t:'inact',a:'С 6 лет',dose:'Ревакцинация каждые 10 лет',note:'Дифтерия + столбняк, уменьшенные дозы. Нацкалендарь для взрослых.'},
+   {n:'Пентаксим (DTPa-IPV/Hib)',m:'Sanofi (Франция)',t:'combo',a:'С 3 мес.',dose:'3+1 дозы',note:'5 в 1: ДТК (бесклеточный) + ИПВ + Hib. Меньше реакций.'},
+   {n:'Инфанрикс / Инфанрикс Гекса',m:'GSK (Бельгия)',t:'combo',a:'С 6 нед.',dose:'3+1 дозы',note:'3–6 в 1: Инфанрикс Гекса = ДТК + HepB + ИПВ + Hib.'},
+   {n:'Адасель / Бустрикс',m:'Sanofi / GSK',t:'inact',a:'С 4 лет',dose:'1 доза (ревакцинация)',note:'Бесклеточный коклюш (малая доза) + АДС. Предпочтительны при беременности и ревакцинации подростков/взрослых.'},
+  ]},
+ {id:'pt-polio',e:'💊',n:'Полиомиелит (3 серотипа)',tp:'РНК-вирус (Picornaviridae, Enterovirus)',col:'#D1FAE5',
+  d:'Первичная серия в детстве (ИПВ×2 + ОПВ). Взрослым без полной серии — 3 дозы ИПВ. ОПВ противопоказана при иммунодефиците.',
+  contra:'ОПВ: иммунодефицит любой этиологии (риск вакциноассоциированного полиомиелита!), беременность, нахождение рядом с иммунодефицитными людьми. ИПВ: аллергия на неомицин, стрептомицин, полимиксин B.',
+   vx:[
+   {n:'Имовакс Полио',m:'Sanofi (Франция)',t:'inact',a:'С 3 мес.',dose:'3 дозы + ревакцинации',note:'ИПВ — инактивированная. Безопасна при иммунодефиците.'},
+   {n:'Полимилекс',m:'Петровакс Фарм (РФ)',t:'inact',a:'С 3 мес.',dose:'3 дозы',note:'Отечественная ИПВ.'},
+   {n:'ОПВ (оральная полиовакцина)',m:'Нацимбио (РФ)',t:'live',a:'С 3 мес. (после ИПВ)',dose:'3 доза и ревакцинации',note:'Живая бивалентная (типы 1 и 3). Противопоказана при иммунодефиците и окружении иммунокомпрометированных.'},
+  ]},
+ {id:'pt-hib',e:'🔵',n:'Гемофильная инфекция тип b (Hib)',tp:'Haemophilus influenzae type b',col:'#DBEAFE',
+  d:'Вызывает менингит, пневмонию, эпиглоттит. В нацкалендаре детям из групп риска. Взрослым показана при аспении, ВИЧ, иммунодефиците.',
+  contra:'Возраст менее 6 нед. Острые инфекционные заболевания. Аллергия на дифтерийный белок CRM197 (для конъюгированных форм).',
+   vx:[
+   {n:'Акт-ХИБ',m:'MSD (Нидерланды)',t:'conj',a:'С 3 мес.',dose:'3+1 дозы (дети) / 1 доза (взрослые)',note:'Конъюгированная. Нацкалендарь для групп риска.'},
+   {n:'Хиберикс',m:'GSK (Бельгия)',t:'conj',a:'С 6 нед.',dose:'3+1 или 1 доза',note:''},
+   {n:'В составе: Пентаксим, Инфанрикс Гекса, Синфлорикс',m:'Sanofi / GSK',t:'combo',a:'С 6 нед.',dose:'По схеме комбинированной вакцины',note:'Наиболее распространённый способ иммунизации детей.'},
+  ]},
+ {id:'pt-rota',e:'🟢',n:'Ротавирусная инфекция',tp:'РНК-вирус (Reoviridae), типы G и P',col:'#D1FAE5',
+  d:'Только детям до 32 недель жизни. Ведущая причина тяжёлой диареи у детей до 5 лет. В нацкалендаре с 2025 года.',
+  contra:'Инвагинация кишечника в анамнезе (абсолютное). Тяжёлый комбинированный иммунодефицит (ТКИД). Возраст более 32 нед. для начала курса — риск инвагинации возрастает. Острые желудочно-кишечные заболевания.',
+   vx:[
+   {n:'РоТатек (RotaTeq)',m:'MSD (Нидерланды)',t:'live',a:'6–32 нед. жизни',dose:'3 дозы перорально: в 2, 4 и 6 мес.',note:'Пентавалентная (G1–G4, P1A). Нацкалендарь с 2025. Начинать не позднее 12 нед.'},
+   {n:'Ротарикс (Rotarix)',m:'GSK (Бельгия)',t:'live',a:'6–24 нед. жизни',dose:'2 дозы перорально',note:'Моновалентная (G1P8). Эффективна против большинства штаммов.'},
+  ]},
+ {id:'pt-bcg',e:'🔵',n:'Туберкулёз (БЦЖ)',tp:'Mycobacterium tuberculosis',col:'#F3F4F6',
+  d:'Новорождённым на 3–7 день. Ревакцинация в 7 лет при отрицательном Диаскинтесте. Живая — противопоказана при ВИЧ и иммунодефиците.',
+  contra:'ВИЧ-инфекция (симптоматическая). Первичный иммунодефицит. Злокачественные новообразования, иммуносупрессивная терапия. Генерализованная БЦЖ-инфекция у ребёнка в семье. Положительный или сомнительный Диаскинтест / проба Манту.',
+   vx:[
+   {n:'БЦЖ',m:'Нацимбио (РФ)',t:'live',a:'Новорождённые',dose:'0,05 мг внутрикожно однократно',note:'Нацкалендарь. Полная доза для здоровых новорождённых.'},
+   {n:'БЦЖ-М',m:'Нацимбио (РФ)',t:'live',a:'Новорождённые из групп риска',dose:'0,025 мг внутрикожно',note:'Уменьшенная доза. Для недоношенных и при противопоказаниях к БЦЖ.'},
+  ]},
+ {id:'pt-tbe',e:'🕷️',n:'Клещевой энцефалит (3 субтипа)',tp:'РНК-вирус (Flaviviridae, Flavivirus)',col:'#FEF3C7',
+  d:'Эндемичен в Сибири, Уральском, Дальневосточном регионах, Поволжье, Северо-Западе. 3 дозы, ревакцинация каждые 3 года. Нацкалендарь по эпидпоказаниям.',
+  contra:'Аллергия на белок куриного яйца — ЭнцеВир и ФСМЕ-Иммун производятся в куриных эмбрионах! Энцепур — без белка яйца, возможная альтернатива. Аллергия на протамин-сульфат (ФСМЕ-Иммун). Острые инфекционные заболевания.',
+   vx:[
+   {n:'ЭнцеВир',m:'Нацимбио / Вирион (РФ)',t:'inact',a:'С 18 лет',dose:'3 дозы (0–1–12 мес.). Экстренная: 0–14 дн.–9–12 мес.',note:'Дальневосточный субтип. Нацкалендарь.'},
+   {n:'ЭнцеВир Нео',m:'Нацимбио (РФ)',t:'inact',a:'С 3 лет',dose:'3 дозы (0–1–12 мес.)',note:'Детская форма.'},
+   {n:'ФСМЕ-Иммун Инжект / Джуниор',m:'Pfizer Austria (Австрия)',t:'inact',a:'С 16 лет / с 12 мес.',dose:'3 дозы (0–1–12 мес.). Экстренная: 0–14 дн.',note:'Европейский субтип. Активен против всех субтипов КЭ.'},
+   {n:'Энцепур взрослый / детский',m:'Bavarian Nordic (Германия)',t:'inact',a:'С 12 лет / с 12 мес.',dose:'3 дозы (0–1–12 мес.). Ускоренная: за 3 нед.',note:'Штамм K23. Более быстрая экстренная схема (3 дозы за 3 нед.).'},
+  ]},
+ {id:'pt-rabies',e:'🐾',n:'Бешенство (Rabies)',tp:'РНК-вирус (Rhabdoviridae, Lyssavirus)',col:'#FFEDD5',
+  d:'Доконтактная профилактика: 3 дозы (0–7–21/28 дней). Ветеринары, путешественники в эндемичные регионы. Постэкспозиционная — по отдельной схеме.',
+  contra:'Для доконтактной профилактики: острые инфекционные заболевания (отложить). Для постэкспозиционной — абсолютных противопоказаний нет (жизнь важнее!). Аллергия на антибиотики в составе (канамицин в КоКАВ).',
+   ep:{title:'Постэкспозиционная профилактика (ПЭП)', text:'<strong>1. Обработать рану</strong>: промыть с мылом 15 мин, обработать антисептиком (70% спирт, йод). НЕ прижигать и НЕ зашивать рану немедленно.<br><strong>2. КоКАВ</strong>: схема 0–3–7–14–28–90 дней. Начать как можно скорее.<br><strong>3. Рабический иммуноглобулин (РИГ)</strong>: при укусах III категории (раны с кровотечением, слизистые, укусы опасных животных) — вводят однократно в первые 7 дней.<br><strong>Категории ВОЗ</strong>: I — контакт без повреждений (ПЭП не нужна); II — царапины (КоКАВ без РИГ); III — укус до крови (КоКАВ + РИГ).<br><em>Постэкспозиционная профилактика абсолютных противопоказаний не имеет!</em>'},
+   vx:[
+   {n:'КоКАВ',m:'Нацимбио / Вирион (РФ)',t:'inact',a:'Любой возраст',dose:'3 дозы (0–7–21/28 дн.). ПЭП: 0–3–7–14–28–90 дн.',note:'Нацкалендарь. Основная вакцина в РФ.'},
+   {n:'Рабипур',m:'Bavarian Nordic (Германия)',t:'inact',a:'Любой возраст',dose:'Как КоКАВ',note:'Штамм Flury LEP.'},
+   {n:'Индираб',m:'Bharat Biotech (Индия)',t:'inact',a:'Любой возраст',dose:'Как КоКАВ',note:''},
+  ]},
+ {id:'pt-typhoid',e:'✈️',n:'Брюшной тиф (Typhoid)',tp:'Salmonella enterica Typhi',col:'#FFEDD5',
+  d:'Высокий риск в Индии, Пакистане, Бангладеш, Африке, Латинской Америке. Ревакцинация через 3 года.',
+  contra:'Острые инфекционные заболевания. Дети до 2–3 лет (в зависимости от препарата). Аллергия на компоненты. Тяжёлые реакции на предыдущую дозу.',
+   vx:[
+   {n:'Тифивак',m:'Нацимбио (РФ)',t:'ps',a:'С 3 лет',dose:'1 доза, ревакцинация через 3 года',note:'Vi-полисахаридная.'},
+   {n:'Вианвак',m:'Genvac Biotech (Индия / РФ)',t:'ps',a:'С 3 лет',dose:'1 доза, ревакцинация через 3 года',note:'Vi-полисахаридная.'},
+   {n:'Тифим Ви',m:'Sanofi (Франция)',t:'ps',a:'С 2 лет',dose:'1 доза, ревакцинация через 3 года',note:'Vi-полисахаридная.'},
+  ]},
+ {id:'pt-yellow',e:'🌍',n:'Жёлтая лихорадка (Yellow Fever)',tp:'РНК-вирус (Flaviviridae)',col:'#FEF3C7',
+  d:'Обязательна для въезда в ряд стран Африки и Южной Америки. Пожизненная защита. Только в уполномоченных центрах вакцинации Роспотребнадзора.',
+  contra:'Аллергия на белок куриного яйца (анафилаксия) — абсолютное. Иммунодефицит (тимома, ВИЧ с CD4 <200). Возраст до 9 мес. (до 6 мес. — абсолютное). Беременность — по жизненным показаниям. Тяжёлые заболевания тимуса.',
+   vx:[
+   {n:'Стамарил',m:'Sanofi Pasteur (Франция)',t:'live',a:'С 9 мес.',dose:'1 доза. Пожизненно.',note:'Живая аттенуированная (штамм 17D). Единственная вакцина против жёлтой лихорадки в РФ.'},
+  ]},
+ {id:'pt-je',e:'🌏',n:'Японский энцефалит (JEV)',tp:'РНК-вирус (Flaviviridae)',col:'#FEF3C7',
+  d:'Актуален при длительных поездках в сельские районы Азии. 2 дозы с интервалом 28 дней.',
+  contra:'Аллергия на протамин-сульфат (Иксиаро). Острые инфекционные заболевания. Аллергические реакции на предыдущую дозу. Возраст до 2 мес.',
+   vx:[
+   {n:'Иксиаро (IXIARO)',m:'Valneva / Pfizer (Австрия)',t:'inact',a:'С 2 мес.',dose:'2 дозы с интервалом 28 дней. Ревакцинация через 1 год.',note:'Инактивированная адсорбированная (штамм SA14-14-2). Единственная в РФ.'},
+  ]},
+ {id:'pt-cholera',e:'💧',n:'Холера (Cholera)',tp:'Vibrio cholerae O1 / O139',col:'#DBEAFE',
+  d:'Показана при поездках в Индию и страны ЮА, Африку, Латинскую Америку, зоны эпидемий. Также обеспечивает ~25% защиту от диареи путешественников (ЭТКП).',
+  contra:'Острые желудочно-кишечные заболевания. Аллергия на компоненты. Возраст до 2 лет. За 1 час до и 1 час после приёма — не есть и не пить (снижает эффективность).',
+   vx:[
+   {n:'Дюкорал (Dukoral)',m:'Valneva (Швеция)',t:'oral',a:'С 2 лет',dose:'Взрослые: 2 дозы с интервалом 1–6 нед. Дети 2–6 лет: 3 дозы. Ревакцинация через 2 года.',note:'Оральная инактивированная + рекомбинантный B-субъединичный токсин. Зарегистрирована в РФ.'},
+  ]},
+ {id:'pt-glps',e:'🔴',n:'ГЛПС (Геморрагическая лихорадка с почечным синдромом)',tp:'Hantavirus (Bunyaviridae)',col:'#FEE2E2',
+  d:'Эндемична в Поволжье, Уральском регионе, Башкирии, Татарстане. Уникальная вакцина — зарегистрирована только в РФ и Китае.',
+  contra:'Острые инфекционные заболевания. Тяжёлые аллергические реакции. Беременность и кормление грудью. Аллергия на формалин, белок мозга мышей (в составе).',
+   vx:[
+   {n:'Хантавак',m:'Нацимбио / Вирион (РФ)',t:'inact',a:'С 18 лет',dose:'2 дозы (0 и +1 мес.). Ревакцинация через 2 года.',note:'Серотипы Пуумала и Хантаан. Единственная вакцина против хантавируса в мире.'},
+  ]},
+ {id:'pt-rsv',e:'🔵',n:'Респираторно-синцитиальный вирус (РСВ)',tp:'РНК-вирус (Pneumoviridae)',col:'#DBEAFE',
+  d:'Новые препараты (2023–2024). Для беременных (защита новорождённого) и лиц 60+. Нирсевимаб — пассивная иммунизация новорождённых.',
+  contra:'Абрисво / Арексви: аллергия на компоненты. Нирсевимаб: аллергия на казиривимаб (предыдущие антитела к РСВ). Острые заболевания.',
+   vx:[
+   {n:'Абрисво (RSVpreF, Pfizer)',m:'Pfizer (США)',t:'rec',a:'Беременные 32–36 нед. / лица 60+',dose:'1 доза',note:'Рекомбинантная субъединичная (bivalent pre-F). Для беременных — защита новорождённого через АТ. Зарегистрирована в РФ.'},
+   {n:'Арексви (mResvia, GSK)',m:'GSK (Бельгия)',t:'rec',a:'С 60 лет',dose:'1 доза',note:'Рекомбинантная субъединичная + адъювант AS01E. Зарегистрирована в РФ.'},
+   {n:'Нирсевимаб (Бейфортус)',m:'AstraZeneca / Sanofi',t:'mono',a:'Новорождённые и дети до 24 мес.',dose:'1 инъекция перед РСВ-сезоном',note:'Моноклональное АТ (не вакцина). Защита ~75%. Включается в ряд программ иммунизации.'},
+  ]},
+ {id:'pt-tul',e:'🐇',n:'Туляремия (Tularemia)',tp:'Francisella tularensis',col:'#FEE2E2',
+  d:'Охотники, фермеры, лесники, лаборатории. Живая — противопоказана при иммунодефиците и беременности.',
+  contra:'Все состояния иммунодефицита (абсолютное — живая). Беременность (абсолютное). Серопозитивность (иммунитет к туляремии после перенесённой инфекции) — нет смысла вакцинировать. Острые заболевания.',
+   vx:[
+   {n:'ЖТВ (живая туляремийная вакцина)',m:'Нацимбио (РФ)',t:'live',a:'С 7 лет',dose:'Однократно накожно. Ревакцинация через 5 лет.',note:'Штамм 15 НИИЭГ. Нацкалендарь по эпидпоказаниям.'},
+  ]},
+ {id:'pt-bru',e:'🐄',n:'Бруцеллёз (Brucellosis)',tp:'Brucella abortus / melitensis',col:'#FEE2E2',
+  d:'Ветеринары, животноводы, работники мясокомбинатов. Живая — противопоказана при беременности и иммунодефиците.',
+  contra:'Иммунодефицит (абсолютное — живая). Беременность и кормление грудью (абсолютное). Положительная реакция Бюрне или серопозитивность на бруцеллёз. Острые инфекционные заболевания.',
+   vx:[
+   {n:'ЖБВ (живая бруцеллёзная вакцина)',m:'Нацимбио (РФ)',t:'live',a:'С 18 лет',dose:'Однократно (п/к или накожно). Ревакцинация через 1 год.',note:'Штамм B. abortus 19-BA. Нацкалендарь по эпидпоказаниям.'},
+  ]},
+ {id:'pt-lept',e:'💧',n:'Лептоспироз (Leptospirosis)',tp:'Leptospira interrogans',col:'#DBEAFE',
+  d:'Ветеринары, животноводы, работники ЖКХ, охотники, рыбаки. Ежегодная вакцинация.',
+  contra:'Острые инфекционные заболевания и обострение аллергических. Тяжёлые сердечно-сосудистые заболевания. Аллергия на компоненты.',
+   vx:[
+   {n:'Вакцина лептоспирозная концентрированная инактивированная',m:'Нацимбио (РФ)',t:'inact',a:'С 7 лет',dose:'1 доза (0,5 мл п/к). Ревакцинация ежегодно.',note:'Поливалентная. Нацкалендарь по эпидпоказаниям.'},
+  ]},
+ {id:'pt-anth',e:'⚠️',n:'Сибирская язва (Anthrax)',tp:'Bacillus anthracis',col:'#FEE2E2',
+  d:'Ветеринары, зоотехники, рабочие мясоперерабатывающих предприятий и кожзаводов. Нацкалендарь по эпидпоказаниям.',
+  contra:'Острые инфекционные заболевания. Злокачественные новообразования. Аллергические заболевания в стадии обострения. Иммунодефицит.',
+   vx:[
+   {n:'Вакцина сибиреязвенная СТИ / ЖСВ',m:'Нацимбио (РФ)',t:'live',a:'С 18 лет',dose:'2 дозы с интервалом 21 день. Ревакцинация ежегодно.',note:'Споровая живая. Нацкалендарь.'},
+  ]},
+ {id:'pt-plague',e:'⚠️',n:'Чума (Plague)',tp:'Yersinia pestis',col:'#FEE2E2',
+  d:'Жители природных очагов (Астраханская обл., Калмыкия, Тыва, Горный Алтай), полевые работники. По решению санитарной службы.',
+  contra:'Острые и хронические инфекционные заболевания в активной форме. Беременность и кормление грудью. Злокачественные новообразования. Детям до 7 лет.',
+   vx:[
+   {n:'Живая чумная вакцина ЕВ ННИИПМ',m:'Нацимбио (РФ)',t:'live',a:'С 7 лет',dose:'Однократно (накожно или п/к). Ревакцинация через 1 год.',note:'Нацкалендарь по эпидпоказаниям.'},
+  ]},
+ {id:'pt-qfev',e:'🔥',n:'Ку-лихорадка (Q Fever)',tp:'Coxiella burnetii (внутриклеточная бактерия)',col:'#FEE2E2',
+  d:'Животноводы, ветеринары, работники мясокомбинатов. Перед вакцинацией — проба Бёрнета.',
+  contra:'Серопозитивность (положительная реакция Бёрнета) — абсолютное, иначе тяжёлые местные реакции. Перенесённая ку-лихорадка. Острые заболевания. Аллергия на компоненты.',
+   vx:[
+   {n:'Вакцина Ку-лихорадочная М-44',m:'Нацимбио (РФ)',t:'live',a:'С 18 лет',dose:'Однократно накожно. Ревакцинация через 1–3 года.',note:'Нацкалендарь по эпидпоказаниям. Предварительный кожный тест обязателен.'},
+  ]},
+];
+
+function filterPth(){
+  const q=document.getElementById('pth-q').value.toLowerCase();
+  let vis=0;
+  PTH.forEach(p=>{
+    const el=document.getElementById(p.id+'c');
+    if(!el)return;
+    const match=!q||p.n.toLowerCase().includes(q)||p.d.toLowerCase().includes(q)||p.vx.some(v=>v.n.toLowerCase().includes(q)||v.m.toLowerCase().includes(q));
+    el.style.display=match?'':'none';
+    if(match)vis++;
+  });
+  document.getElementById('pth-cnt').textContent=`Показано: ${vis} из ${PTH.length}`;
+}
+
+(function buildPth(){
+  const TMAP={live:'live',inact:'inact',rec:'rec',combo:'combo',oral:'oral',mono:'mono',ps:'inact',conj:'rec',vec:'rec',sub:'rec',pep:'rec'};
+  const TNAME={live:'Живая',inact:'Инактивир.',rec:'Рекомбинантная',combo:'Комбинированная',oral:'Оральная',mono:'Моноклональное АТ',ps:'Полисахаридная',conj:'Конъюгированная',vec:'Векторная',sub:'Субъединичная',pep:'Пептидная'};
+  let h='';
+  PTH.forEach(p=>{
+    const rows=p.vx.map(v=>`<tr><td><div class="vxn">${v.n}</div><div class="vxm">${v.m}</div></td><td><span class="vtbg ${TMAP[v.t]||'inact'}">${TNAME[v.t]||v.t}</span></td><td>${v.a}</td><td>${v.dose}</td><td style="color:var(--g6);font-size:10.5px">${v.note||'—'}</td></tr>`).join('');
+    h+=`<div class="ptc cl" id="${p.id}c">
+      <div class="pth" onclick="this.parentElement.classList.toggle('op');this.parentElement.classList.toggle('cl')">
+        <div class="pthi" style="background:${p.col}">${p.e}</div>
+        <div class="pttl">${p.n}</div>
+        <div class="ptbg" style="background:${p.col};color:var(--g8)">${p.vx.length} препарат${p.vx.length===1?'':'а/ов'}</div>
+        <span class="ptchv">▾</span>
+      </div>
+      <div class="ptb">
+        <div class="ptdesc">${p.d}</div>
+        ${p.contra?`<div class="pcontra-block"><strong>⛔ Противопоказания</strong>${p.contra}</div>`:''}${p.ep?`<div class="ep-box"><div class="ep-title">🚨 ${p.ep.title}</div><div class="ep-text">${p.ep.text}</div></div>`:''}
+        <div style="overflow-x:auto;margin-top:10px"><table class="vxtb">
+          <thead><tr><th>Торговое название</th><th>Тип</th><th>Возраст</th><th>Дозирование</th><th>Примечания</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('pth-body').innerHTML=h;
+  document.getElementById('pth-cnt').textContent=`Показано: ${PTH.length} из ${PTH.length}`;
+})();
+
+
+// ══ ANTIBODY TESTS DATA ══
+const LVLCOL  = ['#DC2626','#D97706','#059669','#0284c7'];
+const LVLBG   = ['#FEE2E2','#FEF3C7','#D1FAE5','#DBEAFE'];
+const LVLICON = ['⛔','⚠️','✅','💪'];
+
+const ABTESTS = [
+ {id:'hepb', name:'Антитела к гепатиту B (анти-HBs)', icon:'❤️', col:'#FEF3C7',
+  unit:'МЕ/л', type:'quant', vax:'Гепатит B (Регевак, Энджерикс-В)',
+  hint:'Основной маркер поствакцинального иммунитета к HBV. Проверяют через 1–2 мес. после завершения серии. Медработникам и пациентам на гемодиализе — регулярно каждые 5 лет.',
+  ref:[['<10','Нет иммунитета'],['10–99','Низкий'],['100–999','Достаточный'],['≥1000','Высокий']],
+  ranges:[
+   {max:10,   lvl:0, label:'Нет иммунитета',    desc:'Уровень ниже защитного. Вакцинация не проводилась или иммунный ответ не сформировался (≈5–10% «невосприимчивых»).', rec:'Полная серия 3 дозы (0–1–6 мес.). Повторить анти-HBs через 1–2 мес. после серии. При отсутствии ответа — удвоенные дозы, консультация иммунолога.'},
+   {max:100,  lvl:1, label:'Низкий иммунитет',   desc:'Минимальный защитный уровень. Защита нестабильна.', rec:'1 бустерная доза. Контроль анти-HBs через 1–2 мес. Если не вырос >100 МЕ/л — повторная полная серия.'},
+   {max:1000, lvl:2, label:'Достаточный иммунитет', desc:'Хорошая защита. Сохранится 5–7 лет.', rec:'Ревакцинация через 5–7 лет или при снижении анти-HBs <100 МЕ/л. Медработникам — контроль каждые 5 лет.'},
+   {max:1e9,  lvl:3, label:'Высокий иммунитет',  desc:'Отличный ответ. Долгосрочная надёжная защита.', rec:'Ревакцинация в ближайшее время не требуется. Следующий контроль через 7–10 лет.'},
+  ]},
+ {id:'hepa', name:'Антитела к гепатиту A (анти-HAV IgG)', icon:'❤️', col:'#FEF3C7',
+  unit:null, type:'qual', vax:'Гепатит A (Хаврикс, Аваксим, Альгавак М)',
+  hint:'Определяет иммунитет к HAV — после болезни или вакцинации. Рекомендуется перед вакцинацией (нет смысла прививать при наличии иммунитета) и при планировании поездки в Индию, Юж. Азию, Африку.',
+  ref:[['Отриц.','Нет иммунитета'],['Сомнит.','Неопределённо'],['Полож.','Иммунитет есть']],
+  ranges:[
+   {qual:'neg',  lvl:0, label:'Нет иммунитета',      desc:'Антитела не обнаружены. Полностью восприимчив к HAV.', rec:'Вакцинация: 2 дозы (0 и +6–18 мес.). Пожизненный иммунитет. Перед поездкой в эндемичный регион — первая доза за 2 нед.'},
+   {qual:'equiv', lvl:1, label:'Сомнительный результат', desc:'Пограничный уровень. Иммунитет неопределённый.', rec:'Повторить анализ через 2–4 нед. или провести вакцинацию — это безопасно даже при имеющемся иммунитете.'},
+   {qual:'pos',  lvl:3, label:'Иммунитет есть',       desc:'Антитела обнаружены. Защита сформирована — после болезни или полной серии вакцинации.', rec:'Вакцинация не требуется. Иммунитет после болезни или полного курса — пожизненный.'},
+  ]},
+ {id:'rubella', name:'IgG к вирусу краснухи', icon:'🟠', col:'#FFEDD5',
+  unit:'МЕ/мл', type:'quant', vax:'КПК / Приорикс / КПК-М',
+  hint:'Критически важен женщинам до зачатия. Краснуха в I триместре → синдром врождённой краснухи (глухота, катаракта, пороки сердца). Проверяют при планировании беременности и у медработников.',
+  ref:[['<10','Нет иммунитета'],['10–24','Сомнительный'],['≥25','Иммунитет есть']],
+  ranges:[
+   {max:10,  lvl:0, label:'Нет иммунитета',      desc:'Антитела ниже защитного уровня. Восприимчивость к краснухе высокая.', rec:'Вакцинация КПК. До беременности — за ≥1 месяц. Живая вакцина — противопоказана при беременности.'},
+   {max:25,  lvl:1, label:'Сомнительный уровень', desc:'Пограничный результат. Защита ненадёжна.', rec:'Рекомендуется 1 доза КПК. Контроль IgG через 4–6 нед. после вакцинации.'},
+   {max:1e9, lvl:3, label:'Иммунитет есть',       desc:'Достаточный уровень антител. Защита сформирована.', rec:'Вакцинация не требуется.'},
+  ]},
+ {id:'measles', name:'IgG к вирусу кори', icon:'🟠', col:'#FFEDD5',
+  unit:'МЕ/мл', type:'quant', vax:'КПК / Приорикс / КПК-М',
+  hint:'Единица МЕ/мл (IU/mL) — калибровка по стандарту ВОЗ. Защитный минимум: ≥0,12 МЕ/мл, оптимальный уровень: ≥0,20 МЕ/мл. Используется большинством российских лабораторий (Euroimmun, Вектор-Бест и др.). Если лаборатория выдаёт результат в мМЕ/мл — разделите на 1000.',
+  ref:[['<0,12','Нет иммунитета'],['0,12–0,19','Пограничный'],['0,20–0,99','Достаточный'],['≥1,00','Высокий']],
+  ranges:[
+   {max:0.12, lvl:0, label:'Нет иммунитета',       desc:'Ниже минимального защитного порога ВОЗ (0,12 МЕ/мл). Высокая восприимчивость к кори.', rec:'Вакцинация КПК — 2 дозы с интервалом ≥28 дней. Медработникам — обязательно по нацкалендарю. Живая вакцина противопоказана при беременности и иммунодефиците.'},
+   {max:0.20, lvl:1, label:'Пограничный уровень',  desc:'Выше минимума ВОЗ, но ниже оптимального. Защита может быть недостаточной при высокой инфицирующей дозе.', rec:'1 бустерная доза КПК. Контроль IgG через 4–6 нед.'},
+   {max:1.00, lvl:2, label:'Достаточный иммунитет', desc:'Уровень в защитном диапазоне. Хорошая защита от кори.', rec:'Вакцинация не требуется. Контроль через 5–10 лет.'},
+   {max:1e9,  lvl:3, label:'Высокий иммунитет',    desc:'Высокий уровень антител. Надёжная долгосрочная защита.', rec:'Вакцинация не требуется.'},
+  ]},
+ {id:'mumps', name:'IgG к вирусу паротита', icon:'🟠', col:'#FFEDD5',
+  unit:null, type:'qual', vax:'КПК / Приорикс / ЖПВ (моновакцина)',
+  hint:'Иммунитет к паротиту нередко снижается даже после 2 доз КПК. Особенно важен для мужчин — орхит при паротите может приводить к бесплодию.',
+  ref:[['Отриц.','Нет иммунитета'],['Сомнит.','Неопределённо'],['Полож.','Иммунитет есть']],
+  ranges:[
+   {qual:'neg',  lvl:0, label:'Нет иммунитета',      desc:'Антитела к вирусу паротита не обнаружены.', rec:'Вакцинация КПК или моновакцина ЖПВ (при наличии иммунитета к кори и краснухе).'},
+   {qual:'equiv', lvl:1, label:'Сомнительный результат', desc:'Пограничный уровень.', rec:'1 доза КПК. Контроль через 4–6 нед.'},
+   {qual:'pos',  lvl:3, label:'Иммунитет есть',       desc:'Антитела обнаружены.', rec:'Вакцинация не требуется.'},
+  ]},
+ {id:'vzv', name:'IgG к вирусу ветряной оспы (VZV)', icon:'🟡', col:'#FEF3C7',
+  unit:'мМЕ/мл', type:'quant', vax:'Варилрикс / Окавакс',
+  hint:'Определяет иммунитет к VZV. Важен при планировании беременности (ветрянка у беременной опасна), у медработников, при иммуносупрессии. Многие лаборатории выдают качественный результат — введите 300 для «положительного» или 50 для «отрицательного», или уточните у лаборатории числовое значение.',
+  ref:[['<100','Нет иммунитета'],['100–200','Пограничный'],['≥200','Иммунитет есть']],
+  ranges:[
+   {max:100,  lvl:0, label:'Нет иммунитета',      desc:'Антитела ниже защитного уровня. Восприимчивость к ветряной оспе высокая.', rec:'Вакцинация: 2 дозы Варилрикс с интервалом 6–10 нед. До беременности — минимум за 1 мес. Противопоказана беременным и при тяжёлом иммунодефиците.'},
+   {max:200,  lvl:1, label:'Пограничный уровень', desc:'Иммунная защита может быть недостаточной.', rec:'Рекомендуется вакцинация. Контроль IgG через 4–6 нед.'},
+   {max:1e9,  lvl:3, label:'Иммунитет есть',       desc:'Достаточный уровень антител. Защита от ветряной оспы сформирована.', rec:'Вакцинация не требуется.'},
+  ]},
+ {id:'tetanus', name:'Антитела к столбнячному анатоксину (IgG)', icon:'💉', col:'#D1FAE5',
+  unit:'МЕ/мл', type:'quant', vax:'АДС-М / АКДС / Пентаксим',
+  hint:'Оценивает поствакцинальный иммунитет к столбняку. Проверяют при неизвестном анамнезе, перед плановыми операциями, травматологическим вмешательствам. Иммунитет снижается через 10 лет.',
+  ref:[['<0.1','Нет иммунитета'],['0.1–0.5','Минимальная защита'],['0.5–1.0','Достаточный'],['≥1.0','Высокий']],
+  ranges:[
+   {max:0.1, lvl:0, label:'Нет иммунитета',      desc:'Уровень ниже минимального защитного. Риск столбняка при травме — высокий.', rec:'Немедленная вакцинация АДС-М. При загрязнённой ране — дополнительно противостолбнячный иммуноглобулин (ПСЧИГ 250 МЕ).'},
+   {max:0.5, lvl:1, label:'Минимальная защита',   desc:'Пограничный уровень. Защита может быть недостаточной при массивном заражении.', rec:'Ревакцинация АДС-М. Контроль через 1 мес.'},
+   {max:1.0, lvl:2, label:'Достаточный иммунитет', desc:'Хорошая защита от столбняка.', rec:'Ревакцинация АДС-М по нацкалендарю — каждые 10 лет.'},
+   {max:1e9, lvl:3, label:'Высокий иммунитет',    desc:'Отличная поствакцинальная защита.', rec:'Ревакцинация АДС-М через 10 лет от последней дозы.'},
+  ]},
+ {id:'diphtheria', name:'Антитела к дифтерийному анатоксину (IgG)', icon:'💉', col:'#D1FAE5',
+  unit:'МЕ/мл', type:'quant', vax:'АДС-М / АКДС / Пентаксим',
+  hint:'Оценивает иммунитет к дифтерии. Минимально защитный уровень — 0.1 МЕ/мл, полная защита — ≥1.0 МЕ/мл. Проверяется при неизвестном прививочном анамнезе.',
+  ref:[['<0.1','Нет иммунитета'],['0.1–0.99','Минимальная защита'],['≥1.0','Полная защита']],
+  ranges:[
+   {max:0.1, lvl:0, label:'Нет иммунитета',    desc:'Уровень ниже защитного.', rec:'Вакцинация АДС-М. При полном отсутствии прививок — 3 дозы (0–1–6 мес.), при наличии ≥2 прививок — 1 бустер.'},
+   {max:1.0, lvl:1, label:'Минимальная защита', desc:'Частичная защита. Может быть недостаточной при высокой инфицирующей дозе.', rec:'Бустерная доза АДС-М. Контроль через 1 мес.'},
+   {max:1e9, lvl:3, label:'Полная защита',      desc:'Достаточный иммунитет от дифтерии.', rec:'Ревакцинация через 10 лет от последней дозы.'},
+  ]},
+ {id:'tbe', name:'IgG к вирусу клещевого энцефалита (КЭ)', icon:'🕷️', col:'#FEF3C7',
+  unit:'ВЕ/мл', type:'quant', vax:'ЭнцеВир / ФСМЕ-Иммун / Энцепур',
+  hint:'Определяет поствакцинальный иммунитет к КЭ. Защитный уровень ≥126 ВЕ/мл (ELISA Euroimmun; в других системах порог может отличаться — уточняйте референсные значения своей лаборатории). Проверяют через 2–4 нед. после курса и при решении о ревакцинации.',
+  ref:[['<126','Нет/недостаточный'],['126–499','Достаточный'],['≥500','Высокий']],
+  ranges:[
+   {max:126,  lvl:0, label:'Нет / недостаточный иммунитет', desc:'Уровень ниже защитного. Курс не завершён или иммунный ответ слабый.', rec:'Завершить первичный курс (3 дозы: 0–1–9–12 мес. для ЭнцеВира). Контроль IgG через 2–4 нед. после последней дозы.'},
+   {max:500,  lvl:2, label:'Достаточный иммунитет', desc:'Защитный уровень достигнут.', rec:'Ревакцинация через 3 года от последней дозы. Контроль перед ревакцинацией не обязателен.'},
+   {max:1e9,  lvl:3, label:'Высокий иммунитет',    desc:'Отличный поствакцинальный ответ.', rec:'Ревакцинация каждые 3 года.'},
+  ]},
+ {id:'pertussis', name:'Anti-PT IgG (антитела к коклюшному токсину)', icon:'💉', col:'#D1FAE5',
+  unit:'МЕ/мл', type:'quant', vax:'АКДС / Инфанрикс / Адасель / Бустрикс',
+  hint:'Anti-PT (к пертусссину/PT) — основной маркер иммунитета к коклюшу. Иммунитет угасает быстро: через 5–10 лет. Особенно важен при планировании беременности и для медработников (контакт с новорождёнными).',
+  ref:[['<10','Нет иммунитета'],['10–39','Низкий'],['≥40','Достаточный']],
+  ranges:[
+   {max:10,  lvl:0, label:'Нет иммунитета',    desc:'Антитела ниже защитного уровня. Высокая восприимчивость к коклюшу.', rec:'Вакцинация: взрослым — Адасель или Бустрикс (AДС + бесклеточный коклюш). При беременности — 27–36 нед. для защиты новорождённого.'},
+   {max:40,  lvl:1, label:'Низкий уровень',    desc:'Иммунитет снижен. Особенно важно ревакцинироваться при контакте с новорождёнными.', rec:'Ревакцинация Адасель/Бустрикс. Особенно рекомендована беременным и родственникам новорождённых.'},
+   {max:1e9, lvl:3, label:'Достаточный иммунитет', desc:'Уровень антител соответствует защитному.', rec:'Ревакцинация через 5–10 лет. Иммунитет к коклюшу — нестойкий.'},
+  ]},
+];
+
+// ══ BUILD ANALYSIS TAB ══
+(function buildAb(){
+  let h = '';
+  ABTESTS.forEach(t=>{
+    const isQ = t.type==='quant';
+    let inputH = '';
+    if(isQ){
+      inputH = `<div class="at-quant"><input type="number" id="ai-${t.id}" min="0" step="any" placeholder="0.00" oninput="abInput('${t.id}')"><span class="at-unit">${t.unit}</span></div>
+      <button class="at-go" onclick="abInterpret('${t.id}')">🔍 Интерпретировать</button>`;
+    } else {
+      inputH = `<div class="qbtns">
+        <button class="qb" id="qb-${t.id}-neg" onclick="abQual('${t.id}','neg')">Отрицательный</button>
+        <button class="qb" id="qb-${t.id}-equiv" onclick="abQual('${t.id}','equiv')">Сомнительный</button>
+        <button class="qb" id="qb-${t.id}-pos" onclick="abQual('${t.id}','pos')">Положительный</button>
+      </div>`;
+    }
+
+    let refH = '<div class="at-ref"><div class="at-ref-title">Референсные значения</div><table class="at-ref-table">';
+    t.ref.forEach((r,i)=>{
+      const col=LVLCOL[i===t.ref.length-1?3:i]||LVLCOL[2];
+      refH+=`<tr><td style="font-weight:600;color:${col};width:90px">${r[0]}</td><td>${r[1]}</td></tr>`;
+    });
+    refH += '</table></div>';
+
+    h += `<div class="atc" id="atc-${t.id}">
+      <div class="ath" onclick="abToggle('${t.id}')">
+        <div class="aticon" style="background:${t.col}">${t.icon}</div>
+        <div class="at-info">
+          <div class="atn">${t.name}</div>
+          ${t.unit?`<div class="atu">Ед. измерения: ${t.unit}</div>`:'<div class="atu">Качественный результат</div>'}
+        </div>
+        <div class="at-badge" id="abadge-${t.id}"></div>
+        <span class="ptchv">▾</span>
+      </div>
+      <div class="atb" id="atb-${t.id}">
+        <div class="at-hint">${t.hint}</div>
+        <div class="at-lbl">Введите результат:</div>
+        ${inputH}
+        <div id="ares-${t.id}"></div>
+        ${refH}
+      </div>
+    </div>`;
+  });
+  const el = document.getElementById('ab-body');
+  if(el) el.innerHTML = h;
+})();
+
+function abToggle(id){
+  const c=document.getElementById('atc-'+id);
+  c.classList.toggle('open');
+}
+
+function abInput(id){
+  // clear previous result on new input
+  document.getElementById('ares-'+id).innerHTML='';
+}
+
+function abQual(id, val){
+  const t=ABTESTS.find(t=>t.id===id);
+  // reset buttons
+  ['neg','equiv','pos'].forEach(q=>{
+    const btn=document.getElementById(`qb-${id}-${q}`);
+    if(btn) btn.className='qb';
+  });
+  const btn=document.getElementById(`qb-${id}-${val}`);
+  if(btn) btn.className=`qb q-${val}`;
+  // store selection
+  if(!window._abQualVals) window._abQualVals={};
+  window._abQualVals[id]=val;
+  // auto-interpret
+  abInterpret(id);
+}
+
+function abInterpret(id){
+  const t=ABTESTS.find(x=>x.id===id);
+  if(!t) return;
+  let range;
+  if(t.type==='quant'){
+    const inp=document.getElementById('ai-'+id);
+    const val=parseFloat(inp.value);
+    if(isNaN(val)||val<0) return;
+    range=t.ranges.find(r=>val<r.max);
+    if(!range) return;
+    range._inputVal=val;
+  } else {
+    const val=(window._abQualVals||{})[id];
+    if(!val) return;
+    range=t.ranges.find(r=>r.qual===val);
+    if(!range) return;
+  }
+  const col=LVLCOL[range.lvl], bg=LVLBG[range.lvl], ico=LVLICON[range.lvl];
+  const valStr=t.type==='quant'?`${range._inputVal} ${t.unit}`:'';
+  const resEl=document.getElementById('ares-'+id);
+  resEl.innerHTML=`<div class="at-res" style="border-color:${col};margin-top:12px">
+    <div class="at-res-hd" style="background:${bg}">
+      <span class="at-res-label" style="color:${col}">${ico} ${range.label}</span>
+      ${valStr?`<span class="at-res-val" style="color:${col}">${valStr}</span>`:''}
+    </div>
+    <div class="at-res-bd">
+      <div class="at-res-desc">${range.desc}</div>
+      <div class="at-res-rec"><strong>Рекомендация:</strong> ${range.rec}</div>
+      <div class="at-res-vax">💉 <span>${t.vax}</span></div>
+    </div>
+  </div>`;
+  // badge in header
+  const badge=document.getElementById('abadge-'+id);
+  badge.style.display='inline-block';
+  badge.style.background=bg;
+  badge.style.color=col;
+  badge.style.border=`1px solid ${col}`;
+  badge.style.borderRadius='20px';
+  badge.style.fontSize='9.5px';
+  badge.style.fontWeight='700';
+  badge.style.padding='2px 8px';
+  badge.textContent=range.label;
+  // mark card border
+  document.getElementById('atc-'+id).classList.add('has-res');
+}
+
+// ══════════════════════════════════════════════════════
+// TELEGRAM MINI APP INTEGRATION
+// ══════════════════════════════════════════════════════
+var tg = window.Telegram?.WebApp;
+
+(function initTg(){
+  if(!tg) return;
+  tg.ready();
+  tg.expand();
+  function applyHeight(stable){
+    const h = stable
+      ? (tg.viewportStableHeight || tg.viewportHeight || window.innerHeight)
+      : (tg.viewportHeight || window.innerHeight);
+    document.documentElement.style.setProperty('--tg-real-h', h + 'px');
+  }
+  applyHeight(true);
+  tg.onEvent('viewportChanged', function(e){ applyHeight(e.isStateStable); });
+  // Принудительный expand + повтор после settle
+  tg.expand();
+  setTimeout(()=>{ tg.expand(); applyHeight(true); }, 300);
+  tg.MainButton.setText('💉 Получить рекомендации');
+  tg.MainButton.hide();
+  tg.MainButton.onClick(()=>showRes());
+  tg.BackButton.onClick(() => {
+    const rv = document.getElementById('rv');
+    if(rv && rv.style.display !== 'none'){ goBack(); } else { tg.close(); }
+  });
+})();
+
+function updateTgMain(){
+  if(!tg) return;
+  const age = document.getElementById('age')?.value;
+  const sex = document.getElementById('sex')?.value;
+  if(age && sex){ tg.MainButton.show(); tg.MainButton.enable(); }
+  else { tg.MainButton.hide(); }
+}
+
+const CS_KEY = 'vax_patient_v1';
+
+function saveToCloud(){
+  if(!tg?.CloudStorage) return;
+  const data = {
+    age:  document.getElementById('age')?.value || '',
+    sex:  document.getElementById('sex')?.value || '',
+    hist: chk('s-hist'), cond: chk('s-cond'),
+    occ:  chk('s-occ'),  tr:   chk('s-tr'),
+    preg: isOn('sw-pl'), pregnant: isOn('sw-pg'),
+  };
+  tg.CloudStorage.setItem(CS_KEY, JSON.stringify(data), (err)=>{
+    if(!err) showToast('Данные сохранены');
+  });
+}
+
+function loadFromCloud(){
+  if(!tg?.CloudStorage) return;
+  tg.CloudStorage.getItem(CS_KEY, (err, val)=>{
+    if(err || !val) return;
+    try {
+      const d = JSON.parse(val);
+      if(d.age) document.getElementById('age').value = d.age;
+      if(d.sex){ document.getElementById('sex').value = d.sex; updatePregVis(); }
+      const setChks = (secId, vals) => {
+        if(!vals?.length) return;
+        vals.forEach(v=>{ const el=document.querySelector('#'+secId+' input[value="'+v+'"]'); if(el) el.checked=true; });
+      };
+      setChks('s-hist',d.hist); setChks('s-cond',d.cond);
+      setChks('s-occ',d.occ);   setChks('s-tr',d.tr);
+      if(d.preg)     document.getElementById('sw-pl')?.classList.add('on');
+      if(d.pregnant) document.getElementById('sw-pg')?.classList.add('on');
+      upd();
+      showToast('Данные восстановлены');
+    } catch(e){}
+  });
+}
+
+function showToast(msg){
+  let t=document.getElementById('tg-toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='tg-toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.78);color:#fff;padding:8px 18px;border-radius:20px;font-size:12.5px;z-index:9999;transition:opacity .3s;white-space:nowrap;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.style.opacity='0', 2500);
+}
+
+loadFromCloud();
+
+
+// ══════════════════════════════════════════════════════════════
+// ПЛАН ВАКЦИНАЦИИ
+// ══════════════════════════════════════════════════════════════
+
+// Схемы введения: массив дней от первой дозы
+const SCH = {
+  hepB:               [0, 30, 180],
+  hepA:               [0, 210],
+  mmr:                [0, 28],
+  varicella:          [0, 42],
+  hpv:                [0, 60, 180],   // 3-dose; <15 лет: [0,180]
+  tbe:                [0, 30, 270],
+  pneumo:             [0, 56],        // ПКВ13 → ≥8 нед → ППВ23
+  meningococcal:      [0, 56],        // при показаниях 2 дозы
+  zoster:             [0, 90],
+  covid:              [0, 21],
+  rabies:             [0, 7, 21],
+  cholera:            [0, 14],
+  glps:               [0, 30],
+  japanesEncephalitis:[0, 28],
+  anthrax:            [0, 21],
+  tdap:1, influenza:1, yellowFever:1, typhoid:1, bcg:1,
+  tularemia:1, brucellosis:1, plague:1, qfever:1, typhus:1,
+  leptospirosis:1, hib:1, rsv:1, rotavirus:1, polio:1, hpv2:[0,180],
+};
+
+// Живые вакцины (важно для совместимости)
+const VAX_LIVE = new Set(['bcg','mmr','varicella','tularemia','brucellosis',
+  'plague','qfever','typhus','rotavirus','yellowFever']);
+
+// Последняя сгенерированная рекомендация
+var _lastRec = null;
+
+// Сохраняем результат рекомендации для плана
+
+function generatePlan(){
+  if(!_lastRec) {
+    // Попробуем получить из DOM
+    var recBody = document.getElementById('rb2');
+    if(!recBody || !recBody.innerHTML) return;
+  }
+
+  var startDate = document.getElementById('plan-start-date').value;
+  if(!startDate) {
+    var d = new Date();
+    startDate = d.toISOString().split('T')[0];
+    document.getElementById('plan-start-date').value = startDate;
+  }
+  var base = new Date(startDate);
+
+  // Собираем список рекомендованных вакцин из DOM
+  var recIds = [];
+  document.querySelectorAll('#rb2 .vc.r .vcard-icon, #rb2 .vc.rec .vcard-icon').forEach(function(el){
+    // через data-id на карточке
+  });
+  // Лучше: ищем через класс карточки и её содержимое
+  // Берём из последнего результата через сохранённый массив
+  if(!_lastRec) return;
+
+  var allVax = [..._lastRec.rec];
+  if(!allVax.length) return;
+
+  // Проверяем совместимость перед построением плана
+  var hasPneumo  = allVax.includes('pneumo');
+  var hasMening  = allVax.includes('meningococcal');
+  var hasYF      = allVax.includes('yellowFever');
+  var hasBCG     = allVax.includes('bcg');
+  // Живые вакцины (кроме BCG) — можно в один день
+  var liveVax    = allVax.filter(function(id){ return VAX_LIVE.has(id) && id!=='bcg'; });
+  var inactVax   = allVax.filter(function(id){ return !VAX_LIVE.has(id); });
+
+  // Строим план посещений
+  var dayMap = {};  // day -> [vaxId, dose, isLive]
+
+  allVax.forEach(function(id){
+    var sch = SCH[id];
+    var days = Array.isArray(sch) ? sch : [0];
+    // Ежегодные вакцины — всегда 1 доза
+    var isAnnual = (id==='influenza'||id==='leptospirosis');
+    // COVID: если серия завершена — 1 доза ревакцинации
+    var isCovidBooster = (id==='covid' && document.querySelector('#s-hist input[value="hadCOVID"]:checked'));
+    if(isAnnual || isCovidBooster){
+      days = [0];
+    }
+    // Корректировка ВПЧ: если возраст < 15
+    var age = parseInt(document.getElementById('age').value)||30;
+    if(id==='hpv' && age < 15) days = SCH.hpv2 || [0,180];
+
+    days.forEach(function(day, i){
+      if(!dayMap[day]) dayMap[day] = [];
+      dayMap[day].push({id:id, dose:i+1, total:days.length, isLive:VAX_LIVE.has(id)});
+    });
+  });
+
+  // ── Корректируем dayMap по правилам совместимости ──
+  // 1. Пневмококк + менингококк: разносим на 14 дней
+  if(hasPneumo && hasMening && dayMap[0]){
+    var menEntry = dayMap[0].find(function(x){return x.id==='meningococcal';});
+    if(menEntry){
+      dayMap[0] = dayMap[0].filter(function(x){return x.id!=='meningococcal';});
+      if(!dayMap[14]) dayMap[14]=[];
+      dayMap[14].unshift(Object.assign({},menEntry,{compatNote:'Разнесён с пневмококком (интервал 14 дн.)'}));
+    }
+  }
+  // 2. Жёлтая лихорадка: если только с инактивированными → вынести на день 2
+  if(hasYF && dayMap[0]){
+    var yfEntry = dayMap[0].find(function(x){return x.id==='yellowFever';});
+    var otherLivesD0 = dayMap[0].filter(function(x){return x.id!=='yellowFever'&&VAX_LIVE.has(x.id);});
+    if(yfEntry && otherLivesD0.length===0){
+      dayMap[0] = dayMap[0].filter(function(x){return x.id!=='yellowFever';});
+      if(!dayMap[2]) dayMap[2]=[];
+      dayMap[2].unshift(Object.assign({},yfEntry,{compatNote:'Жёлтая лихорадка — предпочтительно отдельным визитом'}));
+    }
+  }
+  // 3. BCG отдельно
+  if(hasBCG && dayMap[0]){
+    var bcgEntry = dayMap[0].find(function(x){return x.id==='bcg';});
+    if(bcgEntry){
+      dayMap[0] = dayMap[0].filter(function(x){return x.id!=='bcg';});
+      if(!dayMap[7]) dayMap[7] = [];
+      dayMap[7].unshift({id:'bcg', dose:1, total:1, isLive:true, alone:true});
+    }
+  }
+
+  // Сортируем дни
+  var days = Object.keys(dayMap).map(Number).sort(function(a,b){return a-b;});
+
+  // Генерируем HTML
+  var html = '';
+  days.forEach(function(day, visitIdx){
+    var items = dayMap[day];
+    if(!items || !items.length) return;
+
+    var visitDate = new Date(base);
+    visitDate.setDate(visitDate.getDate() + day);
+    var dateStr = visitDate.toLocaleDateString('ru-RU', {day:'numeric',month:'long',year:'numeric'});
+    var dayLabel = day === 0 ? 'Сегодня (День 0)' : 'День ' + day;
+
+    var hasLive = items.some(function(x){return x.isLive;});
+    var alone = items.some(function(x){return x.alone;});
+
+    var compatNote = '';
+    if(alone) compatNote = '⚠️ Только эта прививка — БЦЖ вводится отдельно.';
+    else if(hasLive && items.length > 1){
+      var liveItems = items.filter(function(x){return x.isLive;});
+      var inactItems = items.filter(function(x){return !x.isLive;});
+      if(liveItems.length > 0 && inactItems.length > 0){
+        compatNote = 'ℹ️ Живые и инактивированные вакцины можно вводить в один день.';
+      } else if(liveItems.length > 1){
+        compatNote = 'ℹ️ Несколько живых вакцин вводятся в один день (или разносятся на ≥28 дней).';
+      }
+    }
+
+    html += '<div class="visit-card">';
+    html += '<div class="visit-header">';
+    html += '<div class="visit-num">' + (visitIdx+1) + '</div>';
+    html += '<div><div class="visit-date">' + dateStr + '</div>';
+    html += '<div class="visit-day">' + dayLabel + '</div></div>';
+    if(items.length > 1) html += '<div class="visit-note-hd" style="font-size:10px;color:var(--g4)">' + items.length + ' вакцин</div>';
+    html += '</div>';
+
+    html += '<div class="visit-body"><div class="visit-vax-list">';
+    items.forEach(function(item){
+      var v = V[item.id];
+      if(!v) return;
+      var compN = item.compatNote ? ' <span style="font-size:9.5px;color:var(--g4)">(' + item.compatNote + ')</span>' : '';
+      var chipClass = item.alone ? 'vvx-chip' :
+                      item.isLive ? 'vvx-chip live-chip' :
+                      item.total===1 ? 'vvx-chip single-chip' : 'vvx-chip';
+      html += '<div class="' + chipClass + '">';
+      html += '<span>' + (v.i||'💉') + '</span>';
+      html += '<span>' + v.n.split(' (')[0] + '</span>';
+      if(item.total > 1) html += '<span class="vvx-dose">' + item.dose + '/' + item.total + '</span>';
+      html += compN + '</div>';
+    });
+    html += '</div>';
+    if(compatNote) html += '<div class="visit-compat-note">' + compatNote + '</div>';
+    html += '</div></div>';
+  });
+
+  document.getElementById('plan-body').innerHTML = html ||
+    '<div class="plan-empty"><div class="plan-empty-icon">✅</div><p>Нет вакцин для планирования.</p></div>';
+}
+
+// Перехватываем результаты для плана
+var _origGetRec = window.getRec;
+var _origShowResOrig = showRes;
+// Сохраняем результат в _lastRec при showRes
+(function(){
+  var orig = window.showRes;
+  window.showRes = function(){
+    var age=parseInt(document.getElementById('age').value);
+    var sex=document.getElementById('sex').value;
+    var hist=chk('s-hist'),conds=chk('s-cond'),occ=chk('s-occ'),tr=chk('s-tr');
+    var plan=sex==='female'&&isOn('sw-pl'), preg=sex==='female'&&isOn('sw-pg');
+    _lastRec = getRec({age,sex,hist,conds,plan,preg,occ,tr});
+    orig();
+    document.getElementById('compat-all-btn').style.display='';
+    document.getElementById('plan-no-rec').style.display='none';
+    document.getElementById('plan-content').style.display='';
+    var d=new Date(); document.getElementById('plan-start-date').value=d.toISOString().split('T')[0];
+    generatePlan();
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// СОВМЕСТИМОСТЬ ВАКЦИН
+// ══════════════════════════════════════════════════════════════
+
+// Правила совместимости
+// Возвращает {status:'ok'|'warn'|'no', interval:дни, title, text}
+function getCompatInfo(id1, id2){
+  if(id1===id2) return {status:'ok', interval:0, title:'Одна и та же вакцина', text:'Введение нескольких доз одной вакцины регулируется схемой её введения.'};
+
+  var live1 = VAX_LIVE.has(id1), live2 = VAX_LIVE.has(id2);
+  var isBCG1 = id1==='bcg', isBCG2 = id2==='bcg';
+
+  // ── Специальные правила ──
+
+  // Пневмококк + менингококк при аспления:
+  if((id1==='pneumo'&&id2==='meningococcal')||(id1==='meningococcal'&&id2==='pneumo')){
+    return {status:'warn', interval:14,
+      title:'Рекомендуется ввести с интервалом',
+      text:'При аспления оба препарата обязательны. Рекомендуется разнести введение на 2–4 нед. для снижения местных реакций и возможности оценить иммунный ответ на каждую вакцину отдельно. При экстренной вакцинации (например, перед спленэктомией) допустимо одновременно в разные конечности.'};
+  }
+
+  // Жёлтая лихорадка:
+  if(id1==='yellowFever'||id2==='yellowFever'){
+    var other2 = id1==='yellowFever' ? id2 : id1;
+    if(VAX_LIVE.has(other2)){
+      return {status:'warn', interval:28,
+        title:'Одновременно или ≥28 дней',
+        text:'Вакцину от жёлтой лихорадки и другие живые вакцины вводят либо строго в один день, либо с интервалом ≥28 дней. Вводить интервалом менее 28 дней нельзя — снижается иммунный ответ на обе.'};
+    } else {
+      return {status:'warn', interval:0,
+        title:'Предпочтительно отдельным визитом',
+        text:'Вакцина против жёлтой лихорадки (живая) обладает выраженным иммуностимулирующим действием и может конкурировать с другими вакцинами. Предпочтительно планировать её отдельным визитом за 2+ нед. При необходимости — одновременное введение допустимо, но менее желательно.'};
+    }
+  }
+
+  // Ротавирус (оральная живая) + ОПВ (оральная живая)
+  if((id1==='rotavirus'&&id2==='polio')||(id1==='polio'&&id2==='rotavirus')){
+    return {status:'warn', interval:28,
+      title:'Одновременно или ≥28 дней',
+      text:'Две оральные живые вакцины предпочтительно вводить в один день или с интервалом ≥28 дней. Одновременное введение допустимо и применяется в нацкалендаре (ОПВ + ротавирус в 6 мес.).'};
+  }
+
+  // Холера (оральная инактивированная) + Тифивак
+  if((id1==='cholera'&&id2==='typhoid')||(id1==='typhoid'&&id2==='cholera')){
+    return {status:'warn', interval:21,
+      title:'Рекомендуется интервал 3 нед.',
+      text:'Дюкорал (холера) и вакцины против брюшного тифа рекомендуется вводить с интервалом ≥3 нед. во избежание взаимного снижения иммунного ответа (конкуренция на уровне кишечного иммунитета). При срочной поездке — допустимо одновременно.'};
+  }
+
+  // Пневмококк + пневмококк (разные типы — ПКВ13 и ППВ23)
+  // (в нашем приложении это один id, обрабатывается как одна вакцина)
+
+  // BCG — всегда отдельно (кроме HepB у новорождённых)
+  if(isBCG1 || isBCG2){
+    var other = isBCG1 ? id2 : id1;
+    if(other==='hepB') return {status:'warn', interval:0,
+      title:'Допустимо только у новорождённых',
+      text:'БЦЖ и гепатит B можно вводить в один день только новорождённым. Взрослым — раздельно: БЦЖ отдельным визитом.'};
+    return {status:'no', interval:28,
+      title:'Нельзя одновременно',
+      text:'БЦЖ всегда вводится отдельно от других вакцин. Минимальный интервал — 28 дней до/после.'};
+  }
+
+  // Обе живые
+  if(live1 && live2){
+    // Жёлтая лихорадка + ветрянка/КПК — особый случай
+    return {status:'warn', interval:28,
+      title:'Только одновременно или ≥28 дней',
+      text:'Две живые вакцины можно вводить в один день (предпочтительно) или с интервалом не менее 28 дней. Введение с интервалом менее 28 дней может снизить иммунный ответ на вторую вакцину.'};
+  }
+
+  // Живая + инактивированная
+  if(live1 || live2){
+    return {status:'ok', interval:0,
+      title:'Можно в один день',
+      text:'Живые и инактивированные вакцины можно вводить одновременно без ограничений по интервалу.'};
+  }
+
+  // Обе инактивированные — особые случаи
+  if((id1==='cholera'&&id2==='typhoid')||(id1==='typhoid'&&id2==='cholera')){
+    return {status:'warn', interval:0,
+      title:'Лучше с интервалом',
+      text:'Оральную вакцину от холеры (Дюкорал) и вакцину от брюшного тифа рекомендуется вводить с интервалом ≥3 нед. во избежание взаимного ослабления иммунного ответа. При необходимости допустимо одновременно.'};
+  }
+
+  // Все остальные инактивированные — можно одновременно
+  return {status:'ok', interval:0,
+    title:'Можно в один день',
+    text:'Инактивированные вакцины можно вводить одновременно в разные конечности без ограничений по интервалу.'};
+}
+
+// Заполняем селекты
+(function fillCompatSelects(){
+  var opts = Object.entries(V).map(function(e){
+    return '<option value="'+e[0]+'">'+e[1].n.split(' (')[0]+'</option>';
+  }).join('');
+  var base = '<option value="">Выберите вакцину...</option>' + opts;
+  var base3 = '<option value="">— не выбрана —</option>' + opts;
+  document.getElementById('cv1').innerHTML = base;
+  document.getElementById('cv2').innerHTML = base;
+  document.getElementById('cv3').innerHTML = base3;
+})();
+
+function checkCompat(){
+  var v1 = document.getElementById('cv1').value;
+  var v2 = document.getElementById('cv2').value;
+  var v3 = document.getElementById('cv3').value;
+  var el = document.getElementById('compat-result');
+  if(!v1 || !v2){ el.style.display='none'; return; }
+
+  // Собираем все пары для проверки
+  var pairs = [[v1,v2]];
+  if(v3){ pairs.push([v1,v3]); pairs.push([v2,v3]); }
+
+  var icons = {ok:'✅', warn:'⚠️', no:'⛔'};
+
+  // Общий статус = наихудший из всех пар
+  var statusRank = {ok:0, warn:1, no:2};
+  var overallStatus = 'ok';
+  var rows = pairs.map(function(pair){
+    var info = getCompatInfo(pair[0], pair[1]);
+    if(statusRank[info.status] > statusRank[overallStatus]) overallStatus = info.status;
+    var n1 = V[pair[0]] ? V[pair[0]].n.split(' (')[0] : pair[0];
+    var n2 = V[pair[1]] ? V[pair[1]].n.split(' (')[0] : pair[1];
+    return '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(0,0,0,.08)">'
+      + '<div style="font-size:11px;color:var(--g6);margin-bottom:3px">'+n1+' + '+n2+'</div>'
+      + '<div style="display:flex;align-items:center;gap:7px">'
+      + '<span style="font-size:16px">'+icons[info.status]+'</span>'
+      + '<div><div style="font-weight:700;font-size:12.5px">'+info.title+'</div>'
+      + '<div style="font-size:12px;margin-top:2px">'+info.text
+      + (info.interval ? ' <strong>Интервал: '+info.interval+' дн.</strong>' : '')
+      + '</div></div></div></div>';
+  });
+
+  el.className = 'compat-result ' + overallStatus;
+  el.style.display = 'block';
+  el.innerHTML = rows.join('');
+  // Убираем border у последнего
+  el.innerHTML = el.innerHTML.replace(/border-bottom:1px solid rgba\(0,0,0,\.08\)">\s*$/, 'border-bottom:none">');
+}
+
+function checkAllCompat(){
+  if(!_lastRec || !_lastRec.rec.length){
+    document.getElementById('compat-matrix-area').innerHTML =
+      '<p style="color:var(--g6);font-size:12px">Сначала получите рекомендации на вкладке «Подбор вакцин».</p>';
+    return;
+  }
+
+  var ids = _lastRec.rec.slice(0,12); // ограничиваем матрицу
+  var names = ids.map(function(id){ return V[id]?V[id].n.split(' (')[0]:id; });
+
+  var html = '<div class="plan-section-title">Матрица совместимости</div>';
+  html += '<div class="compat-matrix"><table class="cmat"><thead><tr><th></th>';
+  names.forEach(function(n){ html += '<th title="'+n+'">'+n.substring(0,8)+'…</th>'; });
+  html += '</tr></thead><tbody>';
+
+  ids.forEach(function(id1, i){
+    html += '<tr><td class="row-label">'+names[i].substring(0,18)+'</td>';
+    ids.forEach(function(id2, j){
+      if(i===j){ html += '<td class="cv-self">—</td>'; return; }
+      if(j < i){ html += '<td class="cv-self"></td>'; return; }
+      var info = getCompatInfo(id1, id2);
+      var cls = {ok:'cv-ok', warn:'cv-warn', no:'cv-no'}[info.status];
+      var lbl = {ok:'✓', warn:'~', no:'✗'}[info.status];
+      html += '<td class="'+cls+'" title="'+info.title+'">'+lbl+'</td>';
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+  html += '<div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap">';
+  html += '<span style="font-size:11px;color:var(--g6)"><span style="color:#059669;font-weight:700">✓</span> Одновременно</span>';
+  html += '<span style="font-size:11px;color:var(--g6)"><span style="color:#D97706;font-weight:700">~</span> С условием/интервалом</span>';
+  html += '<span style="font-size:11px;color:var(--g6)"><span style="color:#DC2626;font-weight:700">✗</span> Раздельно</span>';
+  html += '</div>';
+  html += '<div class="disc" style="margin-top:10px">Матрица построена по вашему списку рекомендаций (до 12 вакцин). Для полного перечня ограничений консультируйтесь с врачом.</div>';
+
+  document.getElementById('compat-matrix-area').innerHTML = html;
+}
+
+
+// ── Комбинированные вакцины ─────────────────────────────────
+const COMBO_VAX = [
+  {n:'КПК / КПК-М (Приорикс)',covers:['Корь','Краснуха','Паротит'],m:'GSK / Нацимбио',t:'Живая, тривалентная',dose:'2 дозы (12 мес. и 6 лет; взрослым — с интервалом ≥28 дней)',note:'Нацкалендарь. Живая — противопоказана при беременности и иммунодефиците.'},
+  {n:'Пентаксим',covers:['Дифтерия','Столбняк','Коклюш','Полиомиелит (ИПВ)','Hib'],m:'Sanofi (Франция)',t:'ДТКа + ИПВ + Hib (5 в 1)',dose:'3 дозы (3–4,5–6 мес.) + ревакцинация в 18 мес.',note:'Бесклеточный коклюш — меньше реакций, чем АКДС. Широко применяется в РФ.'},
+  {n:'Инфанрикс Гекса',covers:['Дифтерия','Столбняк','Коклюш','Гепатит B','Полиомиелит (ИПВ)','Hib'],m:'GSK (Бельгия)',t:'ДТКа + HepB + ИПВ + Hib (6 в 1)',dose:'3+1 дозы',note:'Максимальное покрытие в одной инъекции — 6 инфекций за 4 визита.'},
+  {n:'Инфанрикс (DTPa)',covers:['Дифтерия','Столбняк','Коклюш'],m:'GSK (Бельгия)',t:'Инактивированная, бесклеточный коклюш',dose:'3+1 дозы',note:'Меньше местных реакций по сравнению с цельноклеточной АКДС.'},
+  {n:'Адасель / Бустрикс',covers:['Дифтерия (малая доза)','Столбняк','Коклюш (бесклеточный)'],m:'Sanofi / GSK',t:'Для подростков и взрослых (Tdap)',dose:'1 доза (ревакцинация с 4 лет)',note:'Предпочтительны беременным (27–36 нед.) и контактным новорождённых.'},
+  {n:'Тетраксим (DTPa-IPV)',covers:['Дифтерия','Столбняк','Коклюш','Полиомиелит (ИПВ)'],m:'Sanofi (Франция)',t:'4 в 1',dose:'3+1 дозы',note:''},
+  {n:'Синфлорикс (PCV10)',covers:['Пневмококк (10 серотипов)','Hib'],m:'GSK (Бельгия)',t:'Конъюгированная',dose:'3+1 дозы (с 6 нед.)',note:'Одновременно защищает от пневмококка 10 серотипов и гемофильной инфекции типа b.'},
+  {n:'Бубо-М',covers:['Гепатит B','Дифтерия','Столбняк'],m:'Комбиотех (РФ)',t:'Рекомбинантная + анатоксин',dose:'По схеме АДС-М (с 6 лет, ревакцинация)',note:'Удобна для одновременной ревакцинации от гепатита B и дифтерии/столбняка у взрослых.'},
+];
+
+(function buildCombo(){
+  var el = document.getElementById('combo-body');
+  if(!el) return;
+  var TNAME={live:'Живая',inact:'Инактивир.',rec:'Рекомбинантная',combo:'Комбинированная',oral:'Оральная',mono:'Моноклональное АТ',ps:'Полисахаридная',conj:'Конъюгированная',vec:'Векторная',sub:'Субъединичная',pep:'Пептидная'};
+  var TMAP={live:'live',inact:'inact',rec:'rec',combo:'combo',oral:'oral',mono:'mono',ps:'inact',conj:'rec',vec:'rec',sub:'rec',pep:'rec'};
+  var h = COMBO_VAX.map(function(c){
+    var covers = c.covers.map(function(x){
+      return '<span style="background:var(--Tl);color:var(--T);border-radius:20px;padding:1px 7px;font-size:10px;font-weight:600;border:1px solid #A7F3D0;display:inline-block;margin:1px">'+x+'</span>';
+    }).join('');
+    var tcls = TMAP[c.t.includes('Живая')?'live':c.t.includes('Инактивир')||c.t.includes('анатоксин')?'inact':c.t.includes('Рекомбинантная')?'rec':'combo']||'inact';
+    var tbadge = '<span class="vtbg '+tcls+'">'+c.t.split('(')[0].trim().substring(0,20)+'</span>';
+    return '<div class="atc" style="margin-bottom:7px">'
+      +'<div class="ath" onclick="this.parentElement.classList.toggle(\'open\')">'
+      +'<div class="aticon" style="background:#EDE9FE">💊</div>'
+      +'<div class="at-info"><div class="atn">'+c.n+'</div>'
+      +'<div class="atu">'+c.m+'</div></div>'
+      +'<span class="ptchv">▾</span></div>'
+      +'<div class="atb">'
+      +'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:9px">'+covers+'</div>'
+      +tbadge
+      +'<div class="at-hint" style="margin:8px 0 0"><strong>Схема:</strong> '+c.dose+'</div>'
+      +(c.note?'<div style="font-size:11px;color:var(--g6);margin-top:5px">'+c.note+'</div>':'')
+      +'</div></div>';
+  }).join('');
+  el.innerHTML = h;
+})();
+
+</script>
+</body>
+</html>
